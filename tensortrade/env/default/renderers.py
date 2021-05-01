@@ -358,14 +358,15 @@ class PlotlyTradingChart(BaseRenderer):
         self._volume_chart = None
         self._performance_chart = None
         self._net_worth_chart = None
+        self._rsi_chart = None
         self._base_annotations = None
         self._last_trade_step = 0
         self._show_chart = display
 
     def _create_figure(self, performance_keys: dict) -> None:
         fig = make_subplots(
-            rows=4, cols=1, shared_xaxes=True, vertical_spacing=0.03,
-            row_heights=[0.55, 0.15, 0.15, 0.15],
+            rows=5, cols=1, shared_xaxes=True, vertical_spacing=0.03,
+            row_heights=[0.55, 0.15, 0.15, 0.15, 0.15],
         )
         fig.add_trace(go.Candlestick(name='Price', xaxis='x1', yaxis='y1',
                                      showlegend=False), row=1, col=1)
@@ -378,21 +379,28 @@ class PlotlyTradingChart(BaseRenderer):
         for k in performance_keys:
             fig.add_trace(go.Scatter(mode='lines', name=k), row=3, col=1)
 
-        fig.add_trace(go.Scatter(mode='lines', name='Net Worth', marker={'color': 'DarkGreen'}),
-                      row=4, col=1)
 
+        fig.add_trace(go.Scatter(mode='lines', name='RSI',marker={'color': 'Red'}), row=4, col=1) #rsi
+        
+        fig.add_trace(go.Scatter(mode='lines', name='Net Worth', marker={'color': 'DarkGreen'}),
+                      row=5, col=1)
+
+        
         fig.update_xaxes(linecolor='Grey', gridcolor='Gainsboro')
         fig.update_yaxes(linecolor='Grey', gridcolor='Gainsboro')
         fig.update_xaxes(title_text='Price', row=1)
         fig.update_xaxes(title_text='Volume', row=2)
         fig.update_xaxes(title_text='Performance', row=3)
-        fig.update_xaxes(title_text='Net Worth', row=4)
+        fig.update_xaxes(title_text='RSI_14', row=4)
+        fig.update_xaxes(title_text='Net Worth', row=5)
+
         fig.update_xaxes(title_standoff=7, title_font=dict(size=12))
 
         self.fig = go.FigureWidget(fig)
         self._price_chart = self.fig.data[0]
         self._volume_chart = self.fig.data[1]
         self._performance_chart = self.fig.data[2]
+        self._rsi_chart = self.fig.data[-2]
         self._net_worth_chart = self.fig.data[-1]
 
         self.fig.update_annotations({'font': {'size': 12}})
@@ -522,6 +530,7 @@ class PlotlyTradingChart(BaseRenderer):
         for trace in self.fig.select_traces(row=3):
             trace.update({'y': performance[trace.name]})
 
+        self._rsi_chart.update({'y': price_history['rsi_14']})
         self._net_worth_chart.update({'y': net_worth})
 
         if self._show_chart:
