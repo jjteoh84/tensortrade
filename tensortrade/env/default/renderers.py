@@ -358,51 +358,95 @@ class PlotlyTradingChart(BaseRenderer):
         self._volume_chart = None
         self._performance_chart = None
         self._net_worth_chart = None
-        self._rsi_chart = None
         self._base_annotations = None
         self._last_trade_step = 0
         self._show_chart = display
 
+        #custom indicator chart
+        self._rsi_1h_chart = None
+        self._stoRsi_1h_chart = None
+        self._bb_1h_chart = None
+        self._bbUp_1h_chart = None
+        self._bbDown_1h_chart = None
+        self._ema100_1h_chart = None
+        self._ema200_1h_chart = None
+        self._ema300_1h_chart = None
+        # self.__4h_chart = None
+        # self.__4h_chart = None
+        # self.__1d_chart = None
+        # self.__1d_chart = None
+        # self.__1d_chart = None
+
+        # self.__1h_chart = None
+        # self.__4h_chart = None
+        # self.__1d_chart = None
+        
     def _create_figure(self, performance_keys: dict) -> None:
         fig = make_subplots(
-            rows=5, cols=1, shared_xaxes=True, vertical_spacing=0.03,
-            row_heights=[0.55, 0.15, 0.15, 0.15, 0.15],
+            rows=6, cols=1, shared_xaxes=True, vertical_spacing=0.03,
+            row_heights=[0.7, 0.15, 0.15, 0.15, 0.15, 0.15],
         )
         fig.add_trace(go.Candlestick(name='Price', xaxis='x1', yaxis='y1',
                                      showlegend=False), row=1, col=1)
         fig.update_layout(xaxis_rangeslider_visible=False)
 
+        fig.add_trace(go.Scatter(mode='lines', name="BB",  line=dict(color='firebrick', width=1,
+                                                                     dash='dash')), row=1, col=1)
+        # dash options include 'dash', 'dot', and 'dashdot'
+        fig.add_trace(go.Scatter(mode='lines', name="BBUp",  line=dict(color='black', width=1,
+                                                                        dash='dot')), row=1, col=1)
+        fig.add_trace(go.Scatter(mode='lines', name="BBDown",  line=dict(color='black', width=1,
+                                                                          dash='dot')), row=1, col=1)
+
+        fig.add_trace(go.Scatter(mode='lines', name="ema100",  line=dict(color='#76FF7A', width=1)), row=1, col=1)
+        fig.add_trace(go.Scatter(mode='lines', name="ema200",  line=dict(color='orange', width=1)), row=1, col=1)
+        fig.add_trace(go.Scatter(mode='lines', name="ema300",  line=dict(color='red', width=1)), row=1, col=1)
+        
         fig.add_trace(go.Bar(name='Volume', showlegend=False,
                              marker={'color': 'DodgerBlue'}),
                       row=2, col=1)
 
         for k in performance_keys:
             fig.add_trace(go.Scatter(mode='lines', name=k), row=3, col=1)
-
-
-        fig.add_trace(go.Scatter(mode='lines', name='RSI',marker={'color': 'Red'}), row=4, col=1) #rsi
         
         fig.add_trace(go.Scatter(mode='lines', name='Net Worth', marker={'color': 'DarkGreen'}),
-                      row=5, col=1)
+                      row=4, col=1)
 
+        fig.add_trace(go.Scatter(mode='lines', name='RSI_1h',marker={'color': 'Red'}), row=5, col=1) #rsi
+
+        fig.add_trace(go.Scatter(mode='lines', name='StoRSI_1h',marker={'color': 'Red'}), row=6, col=1) #rsi
+        
         
         fig.update_xaxes(linecolor='Grey', gridcolor='Gainsboro')
         fig.update_yaxes(linecolor='Grey', gridcolor='Gainsboro')
         fig.update_xaxes(title_text='Price', row=1)
         fig.update_xaxes(title_text='Volume', row=2)
         fig.update_xaxes(title_text='Performance', row=3)
-        fig.update_xaxes(title_text='RSI_14', row=4)
-        fig.update_xaxes(title_text='Net Worth', row=5)
+        fig.update_xaxes(title_text='Net Worth', row=4)
+        fig.update_xaxes(title_text='RSI_1h', row=5)
+        fig.update_xaxes(title_text='StoRSI_1h', row=6)
+        
+
 
         fig.update_xaxes(title_standoff=7, title_font=dict(size=12))
 
         self.fig = go.FigureWidget(fig)
         self._price_chart = self.fig.data[0]
-        self._volume_chart = self.fig.data[1]
-        self._performance_chart = self.fig.data[2]
-        self._rsi_chart = self.fig.data[-2]
-        self._net_worth_chart = self.fig.data[-1]
+        self._bb_1h_chart = self.fig.data[1]
+        self._bbUp_1h_chart = self.fig.data[2]
+        self._bbDown_1h_chart = self.fig.data[3]
+        self._ema100_1h_chart = self.fig.data[4]
+        self._ema200_1h_chart = self.fig.data[5]
+        self._ema300_1h_chart = self.fig.data[6]
+        self._volume_chart = self.fig.data[7]
+        self._performance_chart = self.fig.data[8]
 
+        counter = 8+len(performance_keys)
+        self._net_worth_chart = self.fig.data[counter]
+        
+        self._rsi_1h_chart = self.fig.data[counter+1]
+        self._stoRsi_1h_chart = self.fig.data[counter+2]
+        
         self.fig.update_annotations({'font': {'size': 12}})
         self.fig.update_layout(template='plotly_white', height=self._height, margin=dict(t=50))
         self._base_annotations = self.fig.layout.annotations
@@ -530,9 +574,17 @@ class PlotlyTradingChart(BaseRenderer):
         for trace in self.fig.select_traces(row=3):
             trace.update({'y': performance[trace.name]})
 
-        self._rsi_chart.update({'y': price_history['rsi_14']})
-        self._net_worth_chart.update({'y': net_worth})
 
+        self._net_worth_chart.update({'y': net_worth})
+        self._rsi_1h_chart.update({'y': price_history['rsi_14']})
+        self._stoRsi_1h_chart.update({'y': price_history['stoRsi_1h']})
+        self._bb_1h_chart.update({'y': price_history['bb_1h']})
+        self._bbUp_1h_chart.update({'y': price_history['bbUp_1h']})
+        self._bbDown_1h_chart.update({'y': price_history['bbDown_1h']})
+        self._ema100_1h_chart.update({'y': price_history['ema100_1h']})
+        self._ema200_1h_chart.update({'y': price_history['ema200_1h']})
+        self._ema300_1h_chart.update({'y': price_history['ema300_1h']})
+                
         if self._show_chart:
             self.fig.show()
 

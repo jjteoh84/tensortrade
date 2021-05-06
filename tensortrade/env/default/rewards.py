@@ -190,14 +190,19 @@ class PBR(TensorTradeRewardScheme):
         super().__init__()
         self.position = -1
 
-        r = Stream.sensor(price, lambda p: p.value, dtype="float").diff()
+        ## PBR works when commissions are negligible.
+        ## Need to modify the following line to make it work for cases where commissions are substantial:
+        ###NOTE:  the agent learns to hold its position when abs(r) < commission
+        #r = Stream.sensor(price, lambda p: p.value, dtype="float").diff()
+        r = Stream.sensor(price, lambda p: p.value, dtype="float").pct_change()
         position = Stream.sensor(self, lambda rs: rs.position, dtype="float")
-
-        reward = (position * r).fillna(0).rename("reward")
-
+        reward = ((position * r).fillna(0)).rename("reward")
+        
+        
         self.feed = DataFeed([reward])
         self.feed.compile()
-
+        
+        
     def on_action(self, action: int) -> None:
         self.position = -1 if action == 0 else 1
 
