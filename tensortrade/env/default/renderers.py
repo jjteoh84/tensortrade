@@ -363,14 +363,21 @@ class PlotlyTradingChart(BaseRenderer):
         self._show_chart = display
 
         #custom indicator chart
-        self._rsi_1h_chart = None
-        self._stoRsi_1h_chart = None
         self._bb_1h_chart = None
         self._bbUp_1h_chart = None
         self._bbDown_1h_chart = None
+        self._ema10_1h_chart = None
+        self._ema30_1h_chart = None
+        self._ema60_1h_chart = None
         self._ema100_1h_chart = None
         self._ema200_1h_chart = None
         self._ema300_1h_chart = None
+        self._rsi_1h_chart = None        
+        self._avg_chart = None
+        self._stoRsiVol_chart = None
+        self._stoRsi_1h_chart = None
+
+        
         # self.__4h_chart = None
         # self.__4h_chart = None
         # self.__1d_chart = None
@@ -384,20 +391,23 @@ class PlotlyTradingChart(BaseRenderer):
     def _create_figure(self, performance_keys: dict) -> None:
         fig = make_subplots(
             rows=6, cols=1, shared_xaxes=True, vertical_spacing=0.03,
-            row_heights=[0.7, 0.15, 0.15, 0.15, 0.15, 0.15],
+            row_heights=[1.0, 0.15, 0.15, 0.15, 0.15, 0.15],
         )
         fig.add_trace(go.Candlestick(name='Price', xaxis='x1', yaxis='y1',
                                      showlegend=False), row=1, col=1)
         fig.update_layout(xaxis_rangeslider_visible=False)
 
-        fig.add_trace(go.Scatter(mode='lines', name="BB",  line=dict(color='firebrick', width=1,
-                                                                     dash='dash')), row=1, col=1)
+        fig.add_trace(go.Scatter(mode='lines', name="BB",  line=dict(color='black', width=1.5,
+                                                                     dash='dot')), row=1, col=1)
         # dash options include 'dash', 'dot', and 'dashdot'
         fig.add_trace(go.Scatter(mode='lines', name="BBUp",  line=dict(color='black', width=1,
                                                                         dash='dot')), row=1, col=1)
         fig.add_trace(go.Scatter(mode='lines', name="BBDown",  line=dict(color='black', width=1,
                                                                           dash='dot')), row=1, col=1)
 
+        fig.add_trace(go.Scatter(mode='lines', name="ema10",  line=dict(color='#76FF7A', width=1, dash='dash')), row=1, col=1)
+        fig.add_trace(go.Scatter(mode='lines', name="ema30",  line=dict(color='orange', width=1, dash='dash')), row=1, col=1)
+        fig.add_trace(go.Scatter(mode='lines', name="ema60",  line=dict(color='red', width=1, dash='dash')), row=1, col=1)
         fig.add_trace(go.Scatter(mode='lines', name="ema100",  line=dict(color='#76FF7A', width=1)), row=1, col=1)
         fig.add_trace(go.Scatter(mode='lines', name="ema200",  line=dict(color='orange', width=1)), row=1, col=1)
         fig.add_trace(go.Scatter(mode='lines', name="ema300",  line=dict(color='red', width=1)), row=1, col=1)
@@ -413,9 +423,11 @@ class PlotlyTradingChart(BaseRenderer):
                       row=4, col=1)
 
         fig.add_trace(go.Scatter(mode='lines', name='RSI_1h',marker={'color': 'Red'}), row=5, col=1) #rsi
+        fig.add_trace(go.Scatter(mode='lines', name='avg_1h',marker={'color': 'Blue'}), row=5, col=1) #avg
+        fig.add_trace(go.Scatter(mode='lines', name='stoRsiVol_1h',marker={'color': 'Green'}), row=5, col=1) #stoRsiVol
 
-        fig.add_trace(go.Scatter(mode='lines', name='StoRSI_1h',marker={'color': 'Red'}), row=6, col=1) #rsi
-        
+        fig.add_trace(go.Scatter(mode='lines', name='StoRSI_1h',marker={'color': 'Red'}), row=6, col=1) #storsi
+
         
         fig.update_xaxes(linecolor='Grey', gridcolor='Gainsboro')
         fig.update_yaxes(linecolor='Grey', gridcolor='Gainsboro')
@@ -435,17 +447,22 @@ class PlotlyTradingChart(BaseRenderer):
         self._bb_1h_chart = self.fig.data[1]
         self._bbUp_1h_chart = self.fig.data[2]
         self._bbDown_1h_chart = self.fig.data[3]
-        self._ema100_1h_chart = self.fig.data[4]
-        self._ema200_1h_chart = self.fig.data[5]
-        self._ema300_1h_chart = self.fig.data[6]
-        self._volume_chart = self.fig.data[7]
-        self._performance_chart = self.fig.data[8]
+        self._ema10_1h_chart = self.fig.data[4]
+        self._ema30_1h_chart = self.fig.data[5]
+        self._ema60_1h_chart = self.fig.data[6]
+        self._ema100_1h_chart = self.fig.data[7]
+        self._ema200_1h_chart = self.fig.data[8]
+        self._ema300_1h_chart = self.fig.data[9]
+        self._volume_chart = self.fig.data[10]
+        self._performance_chart = self.fig.data[11]
 
-        counter = 8+len(performance_keys)
+        counter = 11+len(performance_keys)
         self._net_worth_chart = self.fig.data[counter]
         
         self._rsi_1h_chart = self.fig.data[counter+1]
-        self._stoRsi_1h_chart = self.fig.data[counter+2]
+        self._avg_1h_chart = self.fig.data[counter+2]
+        self._stoRsiVol_chart = self.fig.data[counter+3]
+        self._stoRsi_1h_chart = self.fig.data[counter+4]
         
         self.fig.update_annotations({'font': {'size': 12}})
         self.fig.update_layout(template='plotly_white', height=self._height, margin=dict(t=50))
@@ -576,15 +593,22 @@ class PlotlyTradingChart(BaseRenderer):
 
 
         self._net_worth_chart.update({'y': net_worth})
-        self._rsi_1h_chart.update({'y': price_history['rsi_14']})
-        self._stoRsi_1h_chart.update({'y': price_history['stoRsi_1h']})
         self._bb_1h_chart.update({'y': price_history['bb_1h']})
         self._bbUp_1h_chart.update({'y': price_history['bbUp_1h']})
         self._bbDown_1h_chart.update({'y': price_history['bbDown_1h']})
+        self._ema10_1h_chart.update({'y': price_history['ema10_1h']})
+        self._ema30_1h_chart.update({'y': price_history['ema30_1h']})
+        self._ema60_1h_chart.update({'y': price_history['ema60_1h']})
+        
         self._ema100_1h_chart.update({'y': price_history['ema100_1h']})
         self._ema200_1h_chart.update({'y': price_history['ema200_1h']})
         self._ema300_1h_chart.update({'y': price_history['ema300_1h']})
-                
+
+        self._rsi_1h_chart.update({'y': price_history['rsi_14']})
+        self._stoRsi_1h_chart.update({'y': price_history['stoRsi_1h']})
+        self._avg_1h_chart.update({'y': price_history['avg_1h']})
+        self._stoRsiVol_chart.update({'y': price_history['stoRsiVol_1h']})
+        
         if self._show_chart:
             self.fig.show()
 
