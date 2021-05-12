@@ -16,7 +16,8 @@ import os
 import sys
 import logging
 import importlib
-
+import metric
+import statistics
 from abc import abstractmethod
 from datetime import datetime
 from typing import Union, Tuple
@@ -377,6 +378,7 @@ class PlotlyTradingChart(BaseRenderer):
         self._stoRsiVol_chart = None
         self._stoRsi_1h_chart = None
 
+        self._metric_table = None
         
         # self.__4h_chart = None
         # self.__4h_chart = None
@@ -389,9 +391,20 @@ class PlotlyTradingChart(BaseRenderer):
         # self.__1d_chart = None
         
     def _create_figure(self, performance_keys: dict) -> None:
+        n_plots=7
+        w= 0.5/(n_plots-2)
         fig = make_subplots(
-            rows=6, cols=1, shared_xaxes=True, vertical_spacing=0.03,
-            row_heights=[1.0, 0.15, 0.15, 0.15, 0.15, 0.15],
+            rows=n_plots, cols=1, shared_xaxes=True, vertical_spacing=0.03,
+            row_heights=[0.3, w, w, w, w, w, 0.2],
+            specs=[[{"type": "candlestick"}],
+                   [{"type": "scatter"}],
+                   [{"type": "scatter"}],
+                   [{"type": "scatter"}],
+                   [{"type": "scatter"}],
+                   [{"type": "scatter"}],
+                   
+                   [{"type": "table"}],
+            ]
         )
         fig.add_trace(go.Candlestick(name='Price', xaxis='x1', yaxis='y1',
                                      showlegend=False), row=1, col=1)
@@ -421,13 +434,28 @@ class PlotlyTradingChart(BaseRenderer):
         
         fig.add_trace(go.Scatter(mode='lines', name='Net Worth', marker={'color': 'DarkGreen'}),
                       row=4, col=1)
-
+        #https://plotly.com/python/multiple-axes/
+        
         fig.add_trace(go.Scatter(mode='lines', name='RSI_1h',marker={'color': 'Red'}), row=5, col=1) #rsi
         fig.add_trace(go.Scatter(mode='lines', name='avg_1h',marker={'color': 'Blue'}), row=5, col=1) #avg
         fig.add_trace(go.Scatter(mode='lines', name='stoRsiVol_1h',marker={'color': 'Green'}), row=5, col=1) #stoRsiVol
 
         fig.add_trace(go.Scatter(mode='lines', name='StoRSI_1h',marker={'color': 'Red'}), row=6, col=1) #storsi
 
+        fig.add_trace(
+            go.Table(
+                # header=dict(
+                #     values=["open", "close"],
+                #     font=dict(size=10),
+                #     align="left"
+                # )
+                #,
+                # cells=dict(
+                #     values=[df[k].tolist() for k in price.columns[1:]],
+                #     align = "left")
+            ),
+            row=7, col=1
+        )
         
         fig.update_xaxes(linecolor='Grey', gridcolor='Gainsboro')
         fig.update_yaxes(linecolor='Grey', gridcolor='Gainsboro')
@@ -463,7 +491,8 @@ class PlotlyTradingChart(BaseRenderer):
         self._avg_1h_chart = self.fig.data[counter+2]
         self._stoRsiVol_chart = self.fig.data[counter+3]
         self._stoRsi_1h_chart = self.fig.data[counter+4]
-        
+
+        self._metric_table = self.fig.data[counter+5]
         self.fig.update_annotations({'font': {'size': 12}})
         self.fig.update_layout(template='plotly_white', height=self._height, margin=dict(t=50))
         self._base_annotations = self.fig.layout.annotations
@@ -550,6 +579,100 @@ class PlotlyTradingChart(BaseRenderer):
 
         return tuple(annotations)
 
+    def _calculate_trade_metric(self,
+                                trades: 'OrderedDict',
+                                price_history: 'pd.DataFrame'):
+        """Calculate various trade metrics.
+
+        Parameters
+        ----------
+        trades : `OrderedDict`
+            The history of trades for the current episode.
+        price_history : `pd.DataFrame`
+            The price history of the current episode.
+
+        Returns
+        -------
+        """
+        metrics = {}
+        total_trade = 0
+        profit_trade = 0
+        losing_trade = 0
+        all_profit_loss = []
+        profit = []
+        loss = []
+        duration = []
+        for iTrade,jTrade in zip(list(trades.values())[0::2], list(trades.values())[1::2]):
+            total_trade+=1
+            buyTrade = iTrade[0]
+            sellTrade = jTrade[0]
+
+            
+            openSize_baseInstrUnit = float(buyTrade.size)
+            closeSize_baseInstrUnit = round(sellTrade.size * sellTrade.price, sellTrade.base_instrument.precision)
+            profit_loss = openSize_baseInstrUnit - float(closeSize_baseInstrUnit)
+            all_profit_loss.append(profit_loss)
+            if profit_loss > 0:
+                profit_trade += 1
+                profit.append(profit_loss)
+            else:
+                losing_trade += 1
+                loss.append(profit_loss)
+
+            tradeOpenDatetime = price_history.iloc[buyTrade.step - 1]['date']
+            tradeCloseDatetime = price_history.iloc[sellTrade.step - 1]['date']
+            
+            duration.append(metric.getDuration(tradeOpenDatetime, tradeCloseDatetime, 'hours'))
+            #print(profit_loss)
+            # tp = float(trade.price)
+            # ts = float(trade.size)
+
+            
+            # if buyTrade.side.value == 'buy':
+            #     qty = round(ts / tp, trade.quote_instrument.precision)
+
+            #     step=trade.step,
+            #     datetime=price_history.iloc[trade.step - 1]['date'],
+            #     side=trade.side.value.upper(),
+            #     qty=qty,
+            #     size=ts,
+            #     quote_instrument=trade.quote_instrument,
+            #     price=tp,
+            #     base_instrument=trade.base_instrument,
+            #     type=trade.type.value.upper(),
+            #     commission=trade.commission
+            # else:  print('---WARNING----------- Buy trade is not buy--------------------------')
+
+            # if sellTrade.side.value == 'sell':
+            #         step=trade.step,
+            #         datetime=price_history.iloc[trade.step - 1]['date'],
+            #         side=trade.side.value.upper(),
+            #         qty=ts,
+            #         size=round(ts * tp, trade.base_instrument.precision),
+            #         quote_instrument=trade.quote_instrument,
+            #         price=tp,
+            #         base_instrument=trade.base_instrument,
+            #         type=trade.type.value.upper(),
+            #         commission=trade.commission
+            # else:  print('---WARNING----------- Sell trade is not sell--------------------------')
+
+        
+        if len(trades.values())/2 != total_trade:
+            print('---WARNING----------- Odd number of trades--------------------------')
+
+
+        metrics['total_trade'] = total_trade
+        metrics['win_ratio'] = profit_trade/total_trade*100
+        metrics['profit_trade'] = profit_trade
+        metrics['losing_trade'] = losing_trade
+
+        metrics['avg_openDuration (h)']= statistics.mode(duration)
+
+        metrics['winning_streak'], metrics['losing_streak'] = metric.consecutive_profit_loss(all_profit_loss)
+
+       
+        return metrics
+
     def render_env(self,
                    episode: int = None,
                    max_episodes: int = None,
@@ -585,7 +708,6 @@ class PlotlyTradingChart(BaseRenderer):
             close=price_history['close']
         ))
         self.fig.layout.annotations += self._create_trade_annotations(trades, price_history)
-
         self._volume_chart.update({'y': price_history['volume']})
 
         for trace in self.fig.select_traces(row=3):
@@ -608,7 +730,16 @@ class PlotlyTradingChart(BaseRenderer):
         self._stoRsi_1h_chart.update({'y': price_history['stoRsi_1h']})
         self._avg_1h_chart.update({'y': price_history['avg_1h']})
         self._stoRsiVol_chart.update({'y': price_history['stoRsiVol_1h']})
+
+        metrics = self._calculate_trade_metric(trades, price_history)        
+        metrics['max_drawDown (%)'] = metric.maximum_drawdown(net_worth)
         
+        self._metric_table.update({'header':dict( values=[k for k in metrics.keys()],
+                                                  font=dict(size=10),
+                                                  align="left")})
+        self._metric_table.update({'cells': dict( values=[metrics[k] for k in metrics.keys()],
+                                                  align = "left")})
+
         if self._show_chart:
             self.fig.show()
 
