@@ -610,7 +610,8 @@ class PlotlyTradingChart(BaseRenderer):
             
             openSize_baseInstrUnit = float(buyTrade.size)
             closeSize_baseInstrUnit = round(sellTrade.size * sellTrade.price, sellTrade.base_instrument.precision)
-            profit_loss = openSize_baseInstrUnit - float(closeSize_baseInstrUnit)
+            profit_loss = float(closeSize_baseInstrUnit) -  openSize_baseInstrUnit 
+
             all_profit_loss.append(profit_loss)
             if profit_loss > 0:
                 profit_trade += 1
@@ -662,11 +663,11 @@ class PlotlyTradingChart(BaseRenderer):
 
 
         metrics['total_trade'] = total_trade
-        metrics['win_ratio'] = profit_trade/total_trade*100
+        metrics['win_ratio'] = 0.0 if total_trade==0 else profit_trade/total_trade*100
         metrics['profit_trade'] = profit_trade
         metrics['losing_trade'] = losing_trade
 
-        metrics['avg_openDuration (h)']= statistics.mode(duration)
+        metrics['avg_openDuration (h)'] = 0.0 if len(duration)== 0 else statistics.mode(duration)
 
         metrics['winning_streak'], metrics['losing_streak'] = metric.consecutive_profit_loss(all_profit_loss)
 

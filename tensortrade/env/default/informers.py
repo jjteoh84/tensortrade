@@ -12,6 +12,6 @@ class TensorTradeInformer(Informer):
             'step': self.clock.step,
             'df_price_history': pd.DataFrame(env.observer.renderer_history),
             'df_performance': pd.DataFrame.from_dict(env.action_scheme.portfolio.performance, orient='index'),
-            'list_trade_object': env.action_scheme.broker.trades.values()
-            
+            'list_trade_object': env.action_scheme.broker.trades.values(),
+            'reward_metric': env.reward_scheme._reward_metric
         }

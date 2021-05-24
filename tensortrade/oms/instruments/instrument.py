@@ -142,7 +142,7 @@ ATOM = Instrument('ATOM', 8, 'Cosmos')
 DAI = Instrument('DAI', 8, 'Dai')
 USDT = Instrument('USDT', 8, 'Tether')
 ADA = Instrument('ADA', 8, 'Cardano')
-
+DOT = Instrument('DOT', 8, 'Polkadot')
 # FX
 USD = Instrument('USD', 2, 'U.S. Dollar')
 EUR = Instrument('EUR', 2, 'Euro')

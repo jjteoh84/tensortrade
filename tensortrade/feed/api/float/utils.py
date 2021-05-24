@@ -90,6 +90,22 @@ def log(s: "Stream[float]") -> "Stream[float]":
     """
     return s.apply(np.log).astype("float")
 
+@Float.register(["log10"])
+def log10(s: "Stream[float]") -> "Stream[float]":
+    """Computes the log10 of a float stream.
+
+    Parameters
+    ----------
+    s : `Stream[float]`
+        A float stream.
+
+    Returns
+    -------
+    `Stream[float]`
+        The log10 stream of `s`.
+    """
+    return s.apply(np.log10).astype("float")
+
 
 @Float.register(["pct_change"])
 def pct_change(s: "Stream[float]",

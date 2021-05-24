@@ -152,7 +152,14 @@ class BSH(TensorTradeActionScheme):
 
     def get_orders(self, action: int, portfolio: 'Portfolio') -> 'Order':
         order = None
-
+        # print(action, '-', self.action, '  =====action step: ', self.clock.step)
+        '''action | sel.action | trade
+              1   |     0      |  BUY
+              0   |     1      |  SELL
+              0   |     0      | Do NTH
+              1   |     1      | Do NTH
+        '''
+        hasOrder = False
         if abs(action - self.action) > 0:
             src = self.cash if self.action == 0 else self.asset
             tgt = self.asset if self.action == 0 else self.cash
@@ -162,9 +169,10 @@ class BSH(TensorTradeActionScheme):
 
             order = proportion_order(portfolio, src, tgt, 1.0)
             self.action = action
+            hasOrder = True
 
         for listener in self.listeners:
-            listener.on_action(action)
+            listener.on_action(action, hasOrder, self.clock.step)
 
         return [order]
 
