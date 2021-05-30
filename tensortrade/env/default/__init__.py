@@ -52,14 +52,22 @@ def create(portfolio: 'Portfolio',
     reward_scheme = rewards.get(reward_scheme) if isinstance(reward_scheme, str) else reward_scheme
 
     action_scheme.portfolio = portfolio
-
-    observer = observers.TensorTradeObserver(
+    if kwargs['live']:
+        observer = observers.TensorTradeObserver_live(
         portfolio=portfolio,
         feed=feed,
         renderer_feed=kwargs.get("renderer_feed", None),
         window_size=window_size,
         min_periods=min_periods
-    )
+        )
+    else:
+        observer = observers.TensorTradeObserver(
+            portfolio=portfolio,
+            feed=feed,
+            renderer_feed=kwargs.get("renderer_feed", None),
+            window_size=window_size,
+            min_periods=min_periods
+        )
 
     stopper = stoppers.MaxLossStopper(
         max_allowed_loss=kwargs.get("max_allowed_loss", 0.5)

@@ -133,7 +133,8 @@ class BaseRenderer(Renderer):
             price_history=price_history,
             net_worth=performance.net_worth,
             performance=performance.drop(columns=['base_symbol']),
-            trades=env.action_scheme.broker.trades
+            trades=env.action_scheme.broker.trades,
+            **kwargs
         )
 
     @abstractmethod
@@ -145,7 +146,8 @@ class BaseRenderer(Renderer):
                    price_history: 'pd.DataFrame' = None,
                    net_worth: 'pd.Series' = None,
                    performance: 'pd.DataFrame' = None,
-                   trades: 'OrderedDict' = None) -> None:
+                   trades: 'OrderedDict' = None,
+                   **kwargs) -> None:
         """Renderers the current state of the environment.
 
         Parameters
@@ -206,6 +208,12 @@ class ScreenLogger(BaseRenderer):
     def __init__(self, date_format: str = "%Y-%m-%d %-I:%M:%S %p"):
         super().__init__()
         self._date_format = date_format
+        self.hasOrder = False
+        self.current_step = 0
+        
+    def on_action(self, action: int, hasOrder: bool, current_step: int) -> None:
+        self.hasOrder = hasOrder
+        self.current_step = current_step
 
     def render_env(self,
                    episode: int = None,
@@ -215,9 +223,41 @@ class ScreenLogger(BaseRenderer):
                    price_history: pd.DataFrame = None,
                    net_worth: pd.Series = None,
                    performance: pd.DataFrame = None,
-                   trades: 'OrderedDict' = None):
-        print(self._create_log_entry(episode, max_episodes, step, max_steps, date_format=self._date_format))
+                   trades: 'OrderedDict' = None,
+                   **kwargs
+    ):
+        #print(self._create_log_entry(episode, max_episodes, step, max_steps, date_format=self._date_format))
+        elapsed_time = kwargs.get("elapsed_time", None)
+        if self.hasOrder and trades:
+            trade = trades[list(trades)[-1]][0]
+            tp = float(trade.price)
+            ts = float(trade.size)
+            price_diff=""
+            if trade.side.value == 'sell':
+                previous_trade = trades[list(trades)[-2]][0]
+                price_diff = tp - float(previous_trade.price)
 
+            text_info = dict(
+                    step=trade.step,
+                    datetime=price_history.iloc[trade.step - 1]['date'],
+                    side=trade.side.value.upper(),
+                    qty=ts,
+                    size=round(ts * tp, trade.base_instrument.precision),
+                    quote_instrument=trade.quote_instrument,
+                    price=tp,
+                    base_instrument=trade.base_instrument,
+                    type=trade.type.value.upper(),
+                    commission=trade.commission,
+                    elapsed_time=elapsed_time,
+                    price_diff=price_diff
+            )
+                
+            text = '\033[92m Step {step} [{datetime}] ' \
+                        '\033[91m{side} \033[92m {qty} {quote_instrument} @ {price} {base_instrument} {type} ' \
+                        'Total: {size} {base_instrument} - Comm.: {commission} - Elapsed_time:{elapsed_time} ' \
+                        '- PriceDiff: \033[91m{price_diff}'.format(**text_info)
+            print(" {}\033[00m" .format(text))
+            self.hasOrder = False
 
 class FileLogger(BaseRenderer):
     """Logs information to a file.
@@ -278,7 +318,8 @@ class FileLogger(BaseRenderer):
                    price_history: pd.DataFrame = None,
                    net_worth: pd.Series = None,
                    performance: pd.DataFrame = None,
-                   trades: 'OrderedDict' = None) -> None:
+                   trades: 'OrderedDict' = None,
+                   **kwargs) -> None:
         log_entry = self._create_log_entry(episode, max_episodes, step, max_steps)
         self._logger.info(f"{log_entry} - Performance:\n{performance}")
 
@@ -377,9 +418,13 @@ class PlotlyTradingChart(BaseRenderer):
         self._avg_chart = None
         self._stoRsiVol_chart = None
         self._stoRsi_1h_chart = None
-
+        self._pivot_sup_res_chart = None
         self._metric_table = None
-        
+
+        self.pivot_sup_res = ['PP_1d', 'R1_1d', 'S1_1d',
+                              'R2_1d', 'S2_1d', 'R3_1d', 'S3_1d',
+                              'PP_1w', 'R1_1w', 'S1_1w',
+                              'R2_1w', 'S2_1w', 'R3_1w', 'S3_1w']
         # self.__4h_chart = None
         # self.__4h_chart = None
         # self.__1d_chart = None
@@ -424,6 +469,11 @@ class PlotlyTradingChart(BaseRenderer):
         fig.add_trace(go.Scatter(mode='lines', name="ema100",  line=dict(color='#76FF7A', width=1)), row=1, col=1)
         fig.add_trace(go.Scatter(mode='lines', name="ema200",  line=dict(color='orange', width=1)), row=1, col=1)
         fig.add_trace(go.Scatter(mode='lines', name="ema300",  line=dict(color='red', width=1)), row=1, col=1)
+
+        for k in  self.pivot_sup_res:
+            fig.add_trace(go.Scatter(mode='lines', name=k, line=dict(width=0.5, dash='dashdot')), row=1, col=1)
+
+         
         
         fig.add_trace(go.Bar(name='Volume', showlegend=False,
                              marker={'color': 'DodgerBlue'}),
@@ -481,10 +531,13 @@ class PlotlyTradingChart(BaseRenderer):
         self._ema100_1h_chart = self.fig.data[7]
         self._ema200_1h_chart = self.fig.data[8]
         self._ema300_1h_chart = self.fig.data[9]
-        self._volume_chart = self.fig.data[10]
-        self._performance_chart = self.fig.data[11]
+        self._pivot_sup_res_chart = self.fig.data[10]
+        counter = 10+len(self.pivot_sup_res)
 
-        counter = 11+len(performance_keys)
+        self._volume_chart = self.fig.data[counter]
+        self._performance_chart = self.fig.data[counter+1]
+
+        counter = counter+1+len(performance_keys)
         self._net_worth_chart = self.fig.data[counter]
         
         self._rsi_1h_chart = self.fig.data[counter+1]
@@ -682,7 +735,8 @@ class PlotlyTradingChart(BaseRenderer):
                    price_history: pd.DataFrame = None,
                    net_worth: pd.Series = None,
                    performance: pd.DataFrame = None,
-                   trades: 'OrderedDict' = None) -> None:
+                   trades: 'OrderedDict' = None,
+                   **kwargs) -> None:
         if price_history is None:
             raise ValueError("renderers() is missing required positional argument 'price_history'.")
 
@@ -708,6 +762,11 @@ class PlotlyTradingChart(BaseRenderer):
             low=price_history['low'],
             close=price_history['close']
         ))
+        for trace in self.fig.select_traces(row=1):
+            if trace.name in self.pivot_sup_res:
+                trace.update({'y': price_history[trace.name]})
+
+
         self.fig.layout.annotations += self._create_trade_annotations(trades, price_history)
         self._volume_chart.update({'y': price_history['volume']})
 
@@ -900,7 +959,8 @@ class MatplotlibTradingChart(BaseRenderer):
                    price_history: 'pd.DataFrame' = None,
                    net_worth: 'pd.Series' = None,
                    performance: 'pd.DataFrame' = None,
-                   trades: 'OrderedDict' = None) -> None:
+                   trades: 'OrderedDict' = None,
+                   **kwargs) -> None:
         if price_history is None:
             raise ValueError("renderers() is missing required positional argument 'price_history'.")
 

@@ -104,11 +104,11 @@ class PushFeed(DataFeed):
         for s in self.start:
             s.push(data[s.name])
 
-        output = self.next()
+        # output = self.next()
 
-        for s in self.start:
-            s.value = None
-        return output
+        # for s in self.start:
+        #     s.value = None
+        # return output
 
     def next(self) -> dict:
         if not self.is_loaded:
