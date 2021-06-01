@@ -52,7 +52,8 @@ def create(portfolio: 'Portfolio',
     reward_scheme = rewards.get(reward_scheme) if isinstance(reward_scheme, str) else reward_scheme
 
     action_scheme.portfolio = portfolio
-    if kwargs['live']:
+    isLive = kwargs.get("live", False)
+    if isLive:
         observer = observers.TensorTradeObserver_live(
         portfolio=portfolio,
         feed=feed,

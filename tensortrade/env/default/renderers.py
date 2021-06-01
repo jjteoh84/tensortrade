@@ -124,6 +124,9 @@ class BaseRenderer(Renderer):
             price_history = pd.DataFrame(env.observer.renderer_history)
 
         performance = pd.DataFrame.from_dict(env.action_scheme.portfolio.performance, orient='index')
+        kwargs_= kwargs
+        for c in ['episode','max_episodes','step','max_steps', 'price_history', 'net_worth', 'performance','trades']:
+            if c in kwargs: kwargs_.pop(c)
 
         self.render_env(
             episode=kwargs.get("episode", None),
@@ -134,7 +137,7 @@ class BaseRenderer(Renderer):
             net_worth=performance.net_worth,
             performance=performance.drop(columns=['base_symbol']),
             trades=env.action_scheme.broker.trades,
-            **kwargs
+            **kwargs_
         )
 
     @abstractmethod
