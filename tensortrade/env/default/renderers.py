@@ -217,7 +217,7 @@ class ScreenLogger(BaseRenderer):
     def on_action(self, action: int, hasOrder: bool, current_step: int) -> None:
         self.hasOrder = hasOrder
         self.current_step = current_step
-
+        
     def render_env(self,
                    episode: int = None,
                    max_episodes: int = None,
@@ -235,17 +235,20 @@ class ScreenLogger(BaseRenderer):
             trade = trades[list(trades)[-1]][0]
             tp = float(trade.price)
             ts = float(trade.size)
+            qty = round(ts / tp, trade.quote_instrument.precision)
+            size = ts
             price_diff=""
             if trade.side.value == 'sell':
                 previous_trade = trades[list(trades)[-2]][0]
                 price_diff = tp - float(previous_trade.price)
-
+                qty=ts
+                size=round(ts * tp, trade.base_instrument.precision)
             text_info = dict(
                     step=trade.step,
                     datetime=price_history.iloc[trade.step - 1]['date'],
                     side=trade.side.value.upper(),
-                    qty=ts,
-                    size=round(ts * tp, trade.base_instrument.precision),
+                    qty=qty,
+                    size=size,
                     quote_instrument=trade.quote_instrument,
                     price=tp,
                     base_instrument=trade.base_instrument,
