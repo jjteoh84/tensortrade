@@ -230,10 +230,14 @@ class SimpleOrders(TensorTradeActionScheme):
 
         self._trade_type = self.default('trade_type', trade_type)
         self._order_listener = self.default('order_listener', order_listener)
-
+        self._listeners =[]
         self._action_space = None
         self.actions = None
 
+    def attach(self, listener):
+        self._listeners += [listener]
+        return self
+    
     @property
     def action_space(self) -> Space:
         if not self._action_space:
@@ -254,6 +258,7 @@ class SimpleOrders(TensorTradeActionScheme):
                    action: int,
                    portfolio: 'Portfolio') -> 'List[Order]':
 
+        hasOrder = False
         if action == 0:
             return []
 
@@ -288,6 +293,10 @@ class SimpleOrders(TensorTradeActionScheme):
         if self._order_listener is not None:
             order.attach(self._order_listener)
 
+        hasOrder = True
+        for listener in self._listeners:
+            listener.on_action(action, hasOrder, self.clock.step)
+            
         return [order]
 
 
@@ -343,10 +352,15 @@ class ManagedRiskOrders(TensorTradeActionScheme):
 
         self._trade_type = self.default('trade_type', trade_type)
         self._order_listener = self.default('order_listener', order_listener)
-
+        self._listeners = []
+        
         self._action_space = None
         self.actions = None
 
+    def attach(self, listener):
+        self._listeners += [listener]
+        return self
+    
     @property
     def action_space(self) -> 'Space':
         if not self._action_space:
@@ -366,6 +380,7 @@ class ManagedRiskOrders(TensorTradeActionScheme):
 
     def get_orders(self, action: int, portfolio: 'Portfolio') -> 'List[Order]':
 
+        hasOrder = True
         if action == 0:
             return []
 
@@ -403,6 +418,10 @@ class ManagedRiskOrders(TensorTradeActionScheme):
         if self._order_listener is not None:
             order.attach(self._order_listener)
 
+        hasOrder = True
+        for listener in self._listeners:
+            listener.on_action(action, hasOrder, self.clock.step)
+            
         return [order]
 
 

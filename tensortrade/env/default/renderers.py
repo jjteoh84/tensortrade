@@ -725,7 +725,7 @@ class PlotlyTradingChart(BaseRenderer):
         metrics['profit_trade'] = profit_trade
         metrics['losing_trade'] = losing_trade
 
-        metrics['avg_openDuration (h)'] = 0.0 if len(duration)== 0 else statistics.mode(duration)
+        metrics['avg_openDuration (h)'] = 0.0 if len(duration)== 0 else statistics.mean(duration)
 
         metrics['winning_streak'], metrics['losing_streak'] = metric.consecutive_profit_loss(all_profit_loss)
 
@@ -761,12 +761,15 @@ class PlotlyTradingChart(BaseRenderer):
             display(self.fig)
 
         self.fig.layout.title = self._create_log_entry(episode, max_episodes, step, max_steps)
+
         self._price_chart.update(dict(
             open=price_history['open'],
             high=price_history['high'],
             low=price_history['low'],
             close=price_history['close']
         ))
+        self.fig.update_traces(hovertext=price_history['date'].dt.strftime("%m/%d/%Y, %H:%M:%S"), selector=dict(type='candlestick'))
+
         for trace in self.fig.select_traces(row=1):
             if trace.name in self.pivot_sup_res:
                 trace.update({'y': price_history[trace.name]})
