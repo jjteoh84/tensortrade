@@ -423,6 +423,11 @@ class PlotlyTradingChart(BaseRenderer):
         self._avg_chart = None
         self._stoRsiVol_chart = None
         self._stoRsi_chart = None
+
+        self._rsi_4h_chart = None
+        self._avg_4h_chart = None
+        self._stoRsiVol_4h_chart = None
+        self._stoRsi_4h_chart = None
         self._pivot_sup_res_chart = None
         self._metric_table = None
 
@@ -480,7 +485,7 @@ class PlotlyTradingChart(BaseRenderer):
 
          
         
-        fig.add_trace(go.Bar(name='Volume', showlegend=False,
+        fig.add_trace(go.Bar(name='Volume', showlegend=True,
                              marker={'color': 'DodgerBlue'}),
                       row=2, col=1)
 
@@ -491,12 +496,17 @@ class PlotlyTradingChart(BaseRenderer):
                       row=4, col=1)
         #https://plotly.com/python/multiple-axes/
         
-        fig.add_trace(go.Scatter(mode='lines', name='RSI',marker={'color': 'Red'}), row=5, col=1) #rsi
+        fig.add_trace(go.Scatter(mode='lines', name='RSI',marker={'color': 'Pink'}), row=5, col=1) #rsi
         fig.add_trace(go.Scatter(mode='lines', name='avg',marker={'color': 'Blue'}), row=5, col=1) #avg
         fig.add_trace(go.Scatter(mode='lines', name='stoRsiVol',marker={'color': 'Green'}), row=5, col=1) #stoRsiVol
+        fig.add_trace(go.Scatter(mode='lines', name='StoRSI',marker={'color': 'Red'}), row=5, col=1) #storsi
 
-        fig.add_trace(go.Scatter(mode='lines', name='StoRSI',marker={'color': 'Red'}), row=6, col=1) #storsi
 
+        fig.add_trace(go.Scatter(mode='lines', name='RSI_4h',marker={'color': 'Pink'}), row=6, col=1) #rsi
+        fig.add_trace(go.Scatter(mode='lines', name='avg_4h',marker={'color': 'Blue'}), row=6, col=1) #avg
+        fig.add_trace(go.Scatter(mode='lines', name='stoRsiVol_4h',marker={'color': 'Green'}), row=6, col=1) #stoRsiVol
+        fig.add_trace(go.Scatter(mode='lines', name='StoRSI_4h',marker={'color': 'Red'}), row=6, col=1) #storsi
+        
         fig.add_trace(
             go.Table(
                 # header=dict(
@@ -518,8 +528,8 @@ class PlotlyTradingChart(BaseRenderer):
         fig.update_xaxes(title_text='Volume', row=2)
         fig.update_xaxes(title_text='Performance', row=3)
         fig.update_xaxes(title_text='Net Worth', row=4)
-        fig.update_xaxes(title_text='RSI', row=5)
-        fig.update_xaxes(title_text='StoRSI', row=6)
+        fig.update_xaxes(title_text='2H', row=5)
+        fig.update_xaxes(title_text='4H', row=6)
         
 
 
@@ -550,7 +560,12 @@ class PlotlyTradingChart(BaseRenderer):
         self._stoRsiVol_chart = self.fig.data[counter+3]
         self._stoRsi_chart = self.fig.data[counter+4]
 
-        self._metric_table = self.fig.data[counter+5]
+        self._rsi_4h_chart = self.fig.data[counter+5]
+        self._avg_4h_chart = self.fig.data[counter+6]
+        self._stoRsiVol_4h_chart = self.fig.data[counter+7]
+        self._stoRsi_4h_chart = self.fig.data[counter+8]
+
+        self._metric_table = self.fig.data[counter+9]
         self.fig.update_annotations({'font': {'size': 12}})
         self.fig.update_layout(template='plotly_white', height=self._height, margin=dict(t=50))
         self._base_annotations = self.fig.layout.annotations
@@ -795,10 +810,15 @@ class PlotlyTradingChart(BaseRenderer):
         self._ema300_chart.update({'y': price_history['ema300']})
 
         self._rsi_chart.update({'y': price_history['rsi_14']})
-        self._stoRsi_chart.update({'y': price_history['stoRsi']})
+        self._stoRsi_chart.update({'y': price_history['stoRsi']*100.0})
         self._avg_chart.update({'y': price_history['avg']})
         self._stoRsiVol_chart.update({'y': price_history['stoRsiVol']})
 
+        self._rsi_4h_chart.update({'y': price_history['rsi_14_4h']})
+        self._stoRsi_4h_chart.update({'y': price_history['stoRsi_4h']*100.0})
+        self._avg_4h_chart.update({'y': price_history['avg_4h']})
+        self._stoRsiVol_4h_chart.update({'y': price_history['stoRsiVol_4h']})
+        
         metrics = self._calculate_trade_metric(trades, price_history)        
         metrics['max_drawDown (%)'] = metric.maximum_drawdown(net_worth)
         

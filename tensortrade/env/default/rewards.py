@@ -317,7 +317,7 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
             self.stepPerDay = 24
             self.tradeOpenDuration_factor = 1
             self.maxBuyTrade_perDay_beforePenalty = 2
-            self.minOpenDuration = 72
+            self.minOpenDuration = 60
             self.interval='hours'
             self.unit=1
         elif self.timeframe == '4H':
@@ -580,11 +580,17 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
         
         #total_reward =  self._profit_ratio ###PPO_train_myReward_bsh_v35_profit_ratio/PPO_TradingEnv_a1e60_00000_0_2021-09-12_01-13-50/checkpoint_008520/checkpoint-8520
 
-        if self._reward_metric['duration_sinceLastBuyTrade'] >= self.minOpenDuration and self._reward_metric['duration_sinceLastBuyTrade']<504:
-            total_reward = self._reward_metric['reward_profit'] * self._reward_metric['duration_sinceLastBuyTrade']/10.0
-        else:
-            total_reward = 0.0
-             
+        ## PPO_train_myReward_bsh_v35_profit_ratio/PPO_TradingEnv_2490e_00000_0_2021-09-05_15-16-09
+        ## PPO_train_myReward_bsh_v35_profit_ratio/PPO_TradingEnv_bc686_00000_0_2021-09-17_13-33-06
+        ## PPO_train_myReward_bsh_v35_profit_ratio/PPO_TradingEnv_0eb08_00000_0_2021-09-18_00-05-20
+        # if self._reward_metric['duration_sinceLastBuyTrade'] >= self.minOpenDuration and self._reward_metric['duration_sinceLastBuyTrade']<504:
+        #     total_reward = self._reward_metric['reward_profit'] * self._reward_metric['duration_sinceLastBuyTrade']/10.0
+        # else:
+        #     total_reward = 0.0
+
+
+        total_reward = self._reward_metric['reward_profit']
+        
         # print('-----total_buyTrad ', self._reward_metric['total_buyTrades'])
         # print('-----buy_trade_perday', self.buyTrade_perDay)
 
