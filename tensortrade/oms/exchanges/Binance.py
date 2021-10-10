@@ -16,24 +16,38 @@ class Binance():
                  api_secret,
                  symbol: str,
                  base_instrument: str,
-                 useTestNet: bool = False):
-        
+                 useTestNet: bool = False,
+                 isLive: bool = False
+    ):
+
+        self.isLive = isLive
+        #self.previousBuy_price = 0.0
         self.client = Client(api_key, api_secret, testnet=useTestNet)
 
-        # print(self.client.get_account())
+        # self.asset_balance = 0
+        # self.base_instrument_balance = 10000.0
 
-        # if not useTestNet:
-        #     self.fees = self.client.get_trade_fee(symbol=symbol.upper()+base_instrument.upper())
-
-        self.asset_balance = 0
-        self.base_instrument_balance = 10000.0
-        # self.asset_balance = self.client.get_asset_balance(asset=symbol.upper())["free"]
-        # self.base_instrument_balance = self.client.get_asset_balance(asset=base_instrument.upper())["free"]
-
-        # print('account balance, {} = '.format(symbol), self.asset_balance)
-        # print('account balance, {} = '.format(base_instrument), self.base_instrument_balance)
-        
         self.pair = symbol+base_instrument
+        print('Trading pair: ', self.pair)
+
+        
+
+        if self.isLive:
+            account_info = self.client.get_account()
+            print(list(account_info.items())[:9])
+
+            if not useTestNet:
+                trade_fees = self.client.get_trade_fee(symbol=symbol.upper()+base_instrument.upper())  ## this is a list of dict
+                self.fees = trade_fees[0]['makerCommission'] 
+                print('trading fees/commission = {} '.format(self.fees) )
+        
+            self.asset_balance = self.client.get_asset_balance(asset=symbol.upper())["free"]
+            self.base_instrument_balance = self.client.get_asset_balance(asset=base_instrument.upper())["free"]
+
+            print('account balance, {} = '.format(symbol), self.asset_balance)
+            print('account balance, {} = '.format(base_instrument), self.base_instrument_balance)
+
+
         
     def get_historical_klines(self,
                               trading_pair: str,
@@ -45,7 +59,16 @@ class Binance():
         return self.client.get_historical_klines(trading_pair, interval, from_date, to_date)
 
 
-    
+    def check_all_open_order(self, order_side):
+        
+        list_all_open_orders = self.client.get_open_orders(symbol=self.pair)
+        n_order = 0
+        for order in list_all_open_orders:
+            if order['side'] == order_side and  order['status']=='NEW':
+                n_order+=1
+
+        return n_order
+        
         
     def execute_buy_order(order: 'Order',
                           base_wallet: 'Wallet',
@@ -112,14 +135,30 @@ class Binance():
             price=transfer.price,
             commission=transfer.commission
         )
+
+        # n_order = self.check_all_open_order(SIDE_BUY)
+        # if n_order>0: print(' ======>> There are more than {} existing buy orders, not placing further order'.format(n_order))
         
-        order = self.client.create_test_order(
-            symbol=order.exchange_pair,
-            side=SIDE_BUY,
-            type=ORDER_TYPE_LIMIT,
-            timeInForce=TIME_IN_FORCE_GTC,
-            quantity=transfer.quantity,
-            price=transfer.price)
+        if self.isLive:
+            order = self.client.create_order(
+                symbol=order.exchange_pair,
+                side=SIDE_BUY,
+                type=ORDER_TYPE_LIMIT,
+                timeInForce=TIME_IN_FORCE_GTC,
+                quantity=transfer.quantity,
+                price=transfer.price)
+                        
+            print('  =============== Placing buy order ============== \n', order)
+        else:
+            order = self.client.create_test_order(
+                symbol=order.exchange_pair,
+                side=SIDE_BUY,
+                type=ORDER_TYPE_LIMIT,
+                timeInForce=TIME_IN_FORCE_GTC,
+                quantity=transfer.quantity,
+                price=transfer.price)
+
+            print('  =============== Placing test buy order ============== \n', order)
         
         return trade
 
@@ -187,13 +226,29 @@ class Binance():
             commission=transfer.commission
         )
 
-        order = self.client.create_test_order(
-            symbol=order.exchange_pair,
-            side=SIDE_SELL,
-            type=ORDER_TYPE_LIMIT,
-            timeInForce=TIME_IN_FORCE_GTC,
-            quantity=transfer.quantity,
-            price=transfer.price)
+        # n_order = self.check_all_open_order(SIDE_SELL)
+        # if n_order>0: print(' ======>> There are more than {} existing sell orders, not placing further order'.format(n_order))
+
+        
+        
+        if self.isLive:
+            order = self.client.create_order(
+                symbol=order.exchange_pair,
+                side=SIDE_SELL,
+                type=ORDER_TYPE_LIMIT,
+                timeInForce=TIME_IN_FORCE_GTC,
+                quantity=transfer.quantity,
+                price=transfer.price)
+            print('  =============== Placing sell order ============== \n', order)
+        else:
+            order = self.client.create_test_order(
+                symbol=order.exchange_pair,
+                side=SIDE_SELL,
+                type=ORDER_TYPE_LIMIT,
+                timeInForce=TIME_IN_FORCE_GTC,
+                quantity=transfer.quantity,
+                price=transfer.price)
+            print('  =============== Placing test sell order ============== \n', order)
 
         return trade
 

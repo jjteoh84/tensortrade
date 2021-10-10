@@ -428,6 +428,12 @@ class PlotlyTradingChart(BaseRenderer):
         self._avg_4h_chart = None
         self._stoRsiVol_4h_chart = None
         self._stoRsi_4h_chart = None
+
+        self._rsi_x2_chart = None
+        self._avg_x2_chart = None
+        self._stoRsiVol_x2_chart = None
+        self._stoRsi_x2_chart = None
+        
         self._pivot_sup_res_chart = None
         self._metric_table = None
 
@@ -492,20 +498,27 @@ class PlotlyTradingChart(BaseRenderer):
         for k in performance_keys:
             fig.add_trace(go.Scatter(mode='lines', name=k), row=3, col=1)
         
-        fig.add_trace(go.Scatter(mode='lines', name='Net Worth', marker={'color': 'DarkGreen'}),
-                      row=4, col=1)
+        # fig.add_trace(go.Scatter(mode='lines', name='Net Worth', marker={'color': 'DarkGreen'}),
+        #              row=4, col=1)
         #https://plotly.com/python/multiple-axes/
+
+        ### NOTE: not only the parameter "row" matters, the order of code also matters
+        
+        fig.add_trace(go.Scatter(mode='lines', name='RSI_4h',marker={'color': 'Pink'}), row=4, col=1) #rsi
+        fig.add_trace(go.Scatter(mode='lines', name='avg_4h',marker={'color': 'Blue'}), row=4, col=1) #avg
+        fig.add_trace(go.Scatter(mode='lines', name='stoRsiVol_4h',marker={'color': 'Green'}), row=4, col=1) #stoRsiVol
+        fig.add_trace(go.Scatter(mode='lines', name='StoRSI_4h',marker={'color': 'Red'}), row=4, col=1) #storsi
+
         
         fig.add_trace(go.Scatter(mode='lines', name='RSI',marker={'color': 'Pink'}), row=5, col=1) #rsi
         fig.add_trace(go.Scatter(mode='lines', name='avg',marker={'color': 'Blue'}), row=5, col=1) #avg
         fig.add_trace(go.Scatter(mode='lines', name='stoRsiVol',marker={'color': 'Green'}), row=5, col=1) #stoRsiVol
         fig.add_trace(go.Scatter(mode='lines', name='StoRSI',marker={'color': 'Red'}), row=5, col=1) #storsi
 
-
-        fig.add_trace(go.Scatter(mode='lines', name='RSI_4h',marker={'color': 'Pink'}), row=6, col=1) #rsi
-        fig.add_trace(go.Scatter(mode='lines', name='avg_4h',marker={'color': 'Blue'}), row=6, col=1) #avg
-        fig.add_trace(go.Scatter(mode='lines', name='stoRsiVol_4h',marker={'color': 'Green'}), row=6, col=1) #stoRsiVol
-        fig.add_trace(go.Scatter(mode='lines', name='StoRSI_4h',marker={'color': 'Red'}), row=6, col=1) #storsi
+        fig.add_trace(go.Scatter(mode='lines', name='RSI_x2',marker={'color': 'Pink'}), row=6, col=1) #rsi
+        fig.add_trace(go.Scatter(mode='lines', name='avg_x2',marker={'color': 'Blue'}), row=6, col=1) #avg
+        fig.add_trace(go.Scatter(mode='lines', name='stoRsiVol_x2',marker={'color': 'Green'}), row=6, col=1) #stoRsiVol
+        fig.add_trace(go.Scatter(mode='lines', name='StoRSI_x2',marker={'color': 'Red'}), row=6, col=1) #storsi
         
         fig.add_trace(
             go.Table(
@@ -527,9 +540,9 @@ class PlotlyTradingChart(BaseRenderer):
         fig.update_xaxes(title_text='Price', row=1)
         fig.update_xaxes(title_text='Volume', row=2)
         fig.update_xaxes(title_text='Performance', row=3)
-        fig.update_xaxes(title_text='Net Worth', row=4)
-        fig.update_xaxes(title_text='2H', row=5)
-        fig.update_xaxes(title_text='4H', row=6)
+        fig.update_xaxes(title_text='4H', row=4)
+        fig.update_xaxes(title_text='6H', row=5)
+        fig.update_xaxes(title_text='8H', row=6)
         
 
 
@@ -553,19 +566,36 @@ class PlotlyTradingChart(BaseRenderer):
         self._performance_chart = self.fig.data[counter+1]
 
         counter = counter+1+len(performance_keys)
-        self._net_worth_chart = self.fig.data[counter]
+        #self._net_worth_chart = self.fig.data[counter]        
+        # self._rsi_chart = self.fig.data[counter+1]
+        # self._avg_chart = self.fig.data[counter+2]
+        # self._stoRsiVol_chart = self.fig.data[counter+3]
+        # self._stoRsi_chart = self.fig.data[counter+4]
+
+        # self._rsi_4h_chart = self.fig.data[counter+5]
+        # self._avg_4h_chart = self.fig.data[counter+6]
+        # self._stoRsiVol_4h_chart = self.fig.data[counter+7]
+        # self._stoRsi_4h_chart = self.fig.data[counter+8]
+
+        # self._metric_table = self.fig.data[counter+9]
+
+        self._rsi_4h_chart = self.fig.data[counter]
+        self._avg_4h_chart = self.fig.data[counter+1]
+        self._stoRsiVol_4h_chart = self.fig.data[counter+2]
+        self._stoRsi_4h_chart = self.fig.data[counter+3]
         
-        self._rsi_chart = self.fig.data[counter+1]
-        self._avg_chart = self.fig.data[counter+2]
-        self._stoRsiVol_chart = self.fig.data[counter+3]
-        self._stoRsi_chart = self.fig.data[counter+4]
+        self._rsi_chart = self.fig.data[counter+4]
+        self._avg_chart = self.fig.data[counter+5]
+        self._stoRsiVol_chart = self.fig.data[counter+6]
+        self._stoRsi_chart = self.fig.data[counter+7]
 
-        self._rsi_4h_chart = self.fig.data[counter+5]
-        self._avg_4h_chart = self.fig.data[counter+6]
-        self._stoRsiVol_4h_chart = self.fig.data[counter+7]
-        self._stoRsi_4h_chart = self.fig.data[counter+8]
+        self._rsi_x2_chart = self.fig.data[counter+8]
+        self._avg_x2_chart = self.fig.data[counter+9]
+        self._stoRsiVol_x2_chart = self.fig.data[counter+10]
+        self._stoRsi_x2_chart = self.fig.data[counter+11]
 
-        self._metric_table = self.fig.data[counter+9]
+        self._metric_table = self.fig.data[counter+12]
+        
         self.fig.update_annotations({'font': {'size': 12}})
         self.fig.update_layout(template='plotly_white', height=self._height, margin=dict(t=50))
         self._base_annotations = self.fig.layout.annotations
@@ -797,7 +827,7 @@ class PlotlyTradingChart(BaseRenderer):
             trace.update({'y': performance[trace.name]})
 
 
-        self._net_worth_chart.update({'y': net_worth})
+#        self._net_worth_chart.update({'y': net_worth})
         self._bb_chart.update({'y': price_history['bb']})
         self._bbUp_chart.update({'y': price_history['bbUp']})
         self._bbDown_chart.update({'y': price_history['bbDown']})
@@ -818,6 +848,11 @@ class PlotlyTradingChart(BaseRenderer):
         self._stoRsi_4h_chart.update({'y': price_history['stoRsi_4h']*100.0})
         self._avg_4h_chart.update({'y': price_history['avg_4h']})
         self._stoRsiVol_4h_chart.update({'y': price_history['stoRsiVol_4h']})
+
+        # self._rsi_x2_chart.update({'y': price_history['rsi_14_x2']})
+        # self._stoRsi_x2_chart.update({'y': price_history['stoRsi_x2']*100.0})
+        # self._avg_x2_chart.update({'y': price_history['avg_x2']})
+        # self._stoRsiVol_x2_chart.update({'y': price_history['stoRsiVol_x2']})
         
         metrics = self._calculate_trade_metric(trades, price_history)        
         metrics['max_drawDown (%)'] = metric.maximum_drawdown(net_worth)
