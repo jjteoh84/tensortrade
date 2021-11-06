@@ -506,7 +506,7 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     # print('previousTrade_renderer_history[close]', previousTrade_renderer_history['close'])
                     # print('---profit_noNorm(%): ', profit_noNorm)
                     profit = (current_renderer_history['close'+label] - previousTrade_renderer_history['close'+label])#*15.0/price_range
-
+                    # print('----profit_noNorm: ', last_trade.price, '-', previous_trade.price )
                     # print('----profit: ',  (current_renderer_history['close'+label] - previousTrade_renderer_history['close'+label]), ' ----range: ', price_range)
                     # print('---profit(%): ', profit)
                     
