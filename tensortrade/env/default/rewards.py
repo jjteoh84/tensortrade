@@ -452,8 +452,14 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     # elif self.buyTrade_perDay > self.maxBuyTrade_perDay_beforePenalty:
                     #     self._reward_metric['penalty_nTrade'] = self.buyTrade_perDay
                     #(self.buyTrade_perDay - self.maxBuyTrade_perDay_beforePenalty)/self.maxBuyTrade_perDay_beforePenalty
-
                     self._reward_metric['reward_profit'] = 0.0
+
+                    holding_profit = (current_renderer_history['close'] - lastTrade_renderer_history['close'])/lastTrade_renderer_history['close']
+                    if holding_profit < -0.15 and holding_profit >= -0.35: # penalize agent when drawdown is more than 25%
+                        self._reward_metric['reward_profit'] = holding_profit
+                    elif holding_profit < -0.35:
+                         self._reward_metric['reward_profit'] = holding_profit - 1.0
+                         
                     # print('date----', current_renderer_history['date'])
                     # columns =  ['PP_1d', 'R1_1d', 'S1_1d',
                     #   'R2_1d', 'S2_1d', 'R3_1d', 'S3_1d', 'PP_1w', 'R1_1w', 'S1_1w', 'R2_1w',
