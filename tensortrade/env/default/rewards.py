@@ -327,9 +327,6 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
             self.minOpenDuration = 4
             self.interval='hours'
             self.unit=4
-        print('reward scheme---- stepperday: ', self.stepPerDay)
-        print('reward scheme---- maxBuyTrade_perDay_beforePenalty: ', self.maxBuyTrade_perDay_beforePenalty)
-        print('reward scheme---- minOpenDuration: ', self.minOpenDuration)
 
         self._reward_metric['duration_sinceLastBuyTrade'] = 0.0
         self._reward_metric['reward_pivot'] = 0.0
