@@ -455,7 +455,7 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     # if holding_profit < -0.15 and holding_profit >= -0.35: # penalize agent when drawdown is more than 25%
                     #     self._reward_metric['reward_profit'] = holding_profit
                     
-                    if holding_profit < -0.35:
+                    if holding_profit < -0.15:
                          self._reward_metric['reward_profit'] = holding_profit 
                          
                     # print('date----', current_renderer_history['date'])
