@@ -437,6 +437,8 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                         self._reward_metric['penalty_nTrade'] = self.buyTrade_perDay*2
                     #(self.buyTrade_perDay - self.maxBuyTrade_perDay_beforePenalty)/self.maxBuyTrade_perDay_beforePenalty
         
+                    if len(list(trades)) > 1 and previous_trade.side.value == "sell":
+                        self._reward_metric['reward_profit'] = -1*(current_renderer_history['close'+label] - previousTrade_renderer_history['close'+label])
                 else: ### holding
                     #print('--BUY --holding: ----\n')
                     
@@ -451,12 +453,12 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     #(self.buyTrade_perDay - self.maxBuyTrade_perDay_beforePenalty)/self.maxBuyTrade_perDay_beforePenalty
                     self._reward_metric['reward_profit'] = 0.0
 
-                    holding_profit = (current_renderer_history['close'] - lastTrade_renderer_history['close'])/lastTrade_renderer_history['close']
+                    #holding_profit = (current_renderer_history['close'] - lastTrade_renderer_history['close'])/lastTrade_renderer_history['close']
                     # if holding_profit < -0.15 and holding_profit >= -0.35: # penalize agent when drawdown is more than 25%
                     #     self._reward_metric['reward_profit'] = holding_profit
                     
-                    if holding_profit < -0.15:
-                         self._reward_metric['reward_profit'] = holding_profit 
+                    #if holding_profit < -0.15:
+                     #    self._reward_metric['reward_profit'] = holding_profit 
                          
                     # print('date----', current_renderer_history['date'])
                     # columns =  ['PP_1d', 'R1_1d', 'S1_1d',
@@ -593,7 +595,7 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
         #     total_reward = 0.0
 
 
-        total_reward = self._reward_metric['reward_profit']
+        total_reward = self._reward_metric['reward_profit'] + self._reward_metric['reward_pivot']
         
         # print('-----total_buyTrad ', self._reward_metric['total_buyTrades'])
         # print('-----buy_trade_perday', self.buyTrade_perDay)
