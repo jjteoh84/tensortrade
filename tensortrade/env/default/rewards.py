@@ -405,7 +405,8 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
 
             lastTrade_renderer_history = self.renderer_history.iloc[last_trade_step - 1]
             current_renderer_history = self.renderer_history.iloc[self.current_step - 1]
-
+            if len(list(trades)) > 1:
+                previousTrade_renderer_history = self.renderer_history.iloc[previous_trade.step - 1]
             
             ##this might be the same when hasOrder is True
             price_range= current_renderer_history['PP_1d'+label] - current_renderer_history['S3_1d'+label] ### TO-BE-Modified
@@ -501,7 +502,7 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     # print('\n')
             elif last_trade.side.value == "sell":
                 scaleFactor = 4.0 
-                previousTrade_renderer_history = self.renderer_history.iloc[previous_trade.step - 1]
+                # previousTrade_renderer_history = self.renderer_history.iloc[previous_trade.step - 1]
                 self._reward_metric['duration_sinceLastBuyTrade'] = getDuration(previousTrade_renderer_history['date'], lastTrade_renderer_history['date'], self.interval, self.unit)
 
                 #print(previous_trade.step, ' -- self._reward_metric['duration_sinceLastBuyTrade'] -- ', self._reward_metric['duration_sinceLastBuyTrade'])
