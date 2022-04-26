@@ -439,7 +439,10 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     #(self.buyTrade_perDay - self.maxBuyTrade_perDay_beforePenalty)/self.maxBuyTrade_perDay_beforePenalty
         
                     if len(list(trades)) > 1 and previous_trade.side.value == "sell":
-                        self._reward_metric['reward_profit'] = -1*(current_renderer_history['close'+label] - previousTrade_renderer_history['close'+label])
+                        self._reward_metric['reward_profit'] = -1*(current_renderer_history['close'] - previousTrade_renderer_history['close'])/previousTrade_renderer_history['close']
+
+                    # print('b-------reward profit: ', self._reward_metric['reward_profit'])
+                    # print('b-------reward_pivot: ', self._reward_metric['reward_pivot'])
                 else: ### holding
                     #print('--BUY --holding: ----\n')
                     
@@ -454,13 +457,14 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     #(self.buyTrade_perDay - self.maxBuyTrade_perDay_beforePenalty)/self.maxBuyTrade_perDay_beforePenalty
                     self._reward_metric['reward_profit'] = 0.0
 
-                    #holding_profit = (current_renderer_history['close'] - lastTrade_renderer_history['close'])/lastTrade_renderer_history['close']
+                    holding_profit = (current_renderer_history['close'] - lastTrade_renderer_history['close'])/lastTrade_renderer_history['close']
                     # if holding_profit < -0.15 and holding_profit >= -0.35: # penalize agent when drawdown is more than 25%
                     #     self._reward_metric['reward_profit'] = holding_profit
                     
-                    #if holding_profit < -0.15:
-                     #    self._reward_metric['reward_profit'] = holding_profit 
-                         
+                    # if holding_profit < -0.05:
+                    #     self._reward_metric['reward_profit'] = holding_profit 
+                    # elif holding_profit > 0.0:
+                    self._reward_metric['reward_profit'] = holding_profit
                     # print('date----', current_renderer_history['date'])
                     # columns =  ['PP_1d', 'R1_1d', 'S1_1d',
                     #   'R2_1d', 'S2_1d', 'R3_1d', 'S3_1d', 'PP_1w', 'R1_1w', 'S1_1w', 'R2_1w',
@@ -497,8 +501,9 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     # if self._reward_metric['reward_profit'] <= 0:
                     #     self._reward_metric['reward_duration'] = self._reward_metric['reward_duration']-0.5
 
-                    # print('-------reward profit: ', self._reward_metric['reward_profit'])
+                    # print('h-------reward profit: ', self._reward_metric['reward_profit'])
                     # print('-------reward_duration: ', self._reward_metric['reward_duration'])
+                    #print('b-------reward_pivot: ', self._reward_metric['reward_pivot'])
                     # print('\n')
             elif last_trade.side.value == "sell":
                 scaleFactor = 4.0 
@@ -512,7 +517,8 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     # print('----profit_noNorm: ', last_trade.price, '-', previous_trade.price, ' ----range: ', price_range_noNorm)
                     # print('previousTrade_renderer_history[close]', previousTrade_renderer_history['close'])
                     # print('---profit_noNorm(%): ', profit_noNorm)
-                    profit = (current_renderer_history['close'+label] - previousTrade_renderer_history['close'+label])#*15.0/price_range
+                    #profit = (current_renderer_history['close'+label] - previousTrade_renderer_history['close'+label])#*15.0/price_range
+                    profit = (current_renderer_history['close'] - previousTrade_renderer_history['close'])/previousTrade_renderer_history['close']
                     # print('----profit_noNorm: ', last_trade.price, '-', previous_trade.price )
                     # print('----profit: ',  (current_renderer_history['close'+label] - previousTrade_renderer_history['close'+label]), ' ----range: ', price_range)
                     # print('---profit(%): ', profit)
@@ -552,6 +558,8 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     # print('-------profit ratio: (', net_worths.iloc[-1], ' - ', net_worths.iloc[0], ')/(', self._reward_metric['total_buyTrades'], ' * ', net_worths.iloc[0], '= ', self._profit_ratio)
                     # print('-------duration_sinceLastBuyTrade: ', self._reward_metric['duration_sinceLastBuyTrade'])
                     # print('-------reward_duration: ', self._reward_metric['reward_duration'])
+                    # print('s-------reward profit: ', self._reward_metric['reward_profit'])
+                    # print('s-------reward_pivot: ', self._reward_metric['reward_pivot'])
                     
                 else: ### after sell, stay at sideline 
                     self._reward_metric['reward_pivot'] = 0.0
@@ -697,7 +705,8 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
         # print(' reward: ', reward )
         # print('-------------------------------------------')
         
-        return reward*10.0
+        # return reward*10.0
+        return reward/100.0
         
     def reset(self) -> None:
         """Resets the `position` and `feed` of the reward scheme."""
