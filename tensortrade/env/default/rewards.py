@@ -625,7 +625,7 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
         # print('-----([reward_stoRsi]+reward_stoRsivol+[reward_avg])/3.0 :', (self._reward_metric['reward_stoRsi']+self._reward_metric['reward_stoRsiVol']+self._reward_metric['reward_avg'])/3.0)
 
         # print('-----penalty nTrade: -', self._reward_metric['penalty_nTrade'])
-        # print('-----total reward:', total_reward)  
+        print('-----total reward:', total_reward)  
         # print()
         # print()
         
