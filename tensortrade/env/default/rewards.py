@@ -609,8 +609,8 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
         # else:
         #     total_reward = 0.0
 
-
-        total_reward = self._reward_metric['reward_profit'] + self._reward_metric['reward_pivot'] + self._reward_metric['reward_avg']
+        #        total_reward = self._reward_metric['reward_profit']
+        total_reward = 20*self._reward_metric['reward_profit'] + 10*self._reward_metric['reward_pivot'] + 10* self._reward_metric['reward_avg']
         
         # print('-----total_buyTrad ', self._reward_metric['total_buyTrades'])
         # print('-----buy_trade_perday', self.buyTrade_perDay)
