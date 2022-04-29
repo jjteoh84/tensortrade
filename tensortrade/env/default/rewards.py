@@ -433,20 +433,30 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     #self._reward_metric['reward_avg'] = 0.0 if lastTrade_renderer_history['avg'+label] >= 30.0 else abs(lastTrade_renderer_history['avg'+label]-30.0)/30.0
                     # self._reward_metric['reward_avg'] =  -1*(lastTrade_renderer_history['avg'+label]-50.0)/1000.0
                     # self._reward_metric['reward_avg'] = self._reward_metric['reward_avg'] + (-1)*(lastTrade_renderer_history['avg_4h'+label]-50.0)/1000.0
-                    stoRsi_4h_slope = currentStep_renderer_history['stoRsi_4h'+label] - previous2Step_renderer_history['stoRsi_4h'+label]
+                    stoRsi_4h_slope = math.copysign(1, currentStep_renderer_history['stoRsi_4h'+label] - previous2Step_renderer_history['stoRsi_4h'+label])
+                    avg_4h_slope = math.copysign(1, currentStep_renderer_history['avg_4h'+label] - previous2Step_renderer_history['avg_4h'+label])
+                    stoRsiVol_4h_slope = math.copysign(1, currentStep_renderer_history['stoRsiVol_4h'+label] - previous2Step_renderer_history['stoRsiVol_4h'+label])
+                    avg_slope = math.copysign(1, currentStep_renderer_history['avg'+label] - previous2Step_renderer_history['avg'+label])
+                    stoRsiVol_slope = math.copysign(1, currentStep_renderer_history['stoRsiVol'+label] - previous2Step_renderer_history['stoRsiVol'+label])
+                    avg_1d_slope = math.copysign(1, currentStep_renderer_history['avg_1d'+label] - previous2Step_renderer_history['avg_1d'+label])
+                    stoRsiVol_1d_slope = math.copysign(1, currentStep_renderer_history['stoRsiVol_1d'+label] - previous2Step_renderer_history['stoRsiVol_1d'+label])
+
+
+                    total_slope = stoRsi_4h_slope + avg_4h_slope + stoRsiVol_4h_slope + avg_slope + stoRsiVol_slope + avg_1d_slope + stoRsiVol_1d_slope
                     
                     self._reward_metric['reward_avg'] = -1*(lastTrade_renderer_history['avg'+label] + lastTrade_renderer_history['avg_4h'+label] + lastTrade_renderer_history['avg_1d'+label] - 150.0)/1000
 
                     ### if avg is in oversold region, but stoRsi is not yet increasing, penalized buy trade. 
-                    if self._reward_metric['reward_avg'] > 0: self._reward_metric['reward_avg']*stoRsi_4h_slope/abs(stoRsi_4h_slope)
-                    
+                    if self._reward_metric['reward_avg'] > 0: self._reward_metric['reward_avg'] =  self._reward_metric['reward_avg']*total_slope
+                    else self._reward_metric['reward_avg'] = abs(self._reward_metric['reward_avg']-150)*total_slope
                     # self._reward_metric['reward_stoRsiVol'] =  -1*(lastTrade_renderer_history['stoRsiVol'+label]-50.0)/1000.0
                     # self._reward_metric['reward_stoRsiVol'] = self._reward_metric['reward_stoRsiVol'] + (-1)*(lastTrade_renderer_history['stoRsiVol_4h'+label]-50.0)/1000.0
                     self._reward_metric['reward_stoRsiVol'] = -1*(lastTrade_renderer_history['stoRsiVol'+label] + lastTrade_renderer_history['stoRsiVol_4h'+label] + lastTrade_renderer_history['stoRsiVol_1d'+label] - 150.0)/1000
 
                     ### if stoRsiVol is in oversold region, but stoRsi is not yet increasing, penalized buy trade.
-                    if self._reward_metric['reward_stoRsiVol'] > 0: self._reward_metric['reward_stoRsiVol']*stoRsi_4h_slope/abs(stoRsi_4h_slope)
-
+                    if self._reward_metric['reward_stoRsiVol'] > 0: self._reward_metric['reward_stoRsiVol'] = self._reward_metric['reward_stoRsiVol']*total_slope
+                    else self._reward_metric['reward_stoRsiVol'] = abs(self._reward_metric['reward_stoRsiVol']-150)*total_slope
+                    
                     if self.buyTrade_perDay>0 and  self.buyTrade_perDay <= self.maxBuyTrade_perDay_beforePenalty:
                         self._reward_metric['penalty_nTrade'] = -1*(1.3**self.buyTrade_perDay-1.0)+10.0
                     elif self.buyTrade_perDay == 0:
@@ -560,20 +570,31 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     # self._reward_metric['reward_avg'] = self._reward_metric['reward_avg'] + (lastTrade_renderer_history['avg_4h'+label]-50)/1000
 
 
-                    stoRsi_4h_slope = currentStep_renderer_history['stoRsi_4h'+label] - previous2Step_renderer_history['stoRsi_4h'+label]
+                    stoRsi_4h_slope = math.copysign(1, currentStep_renderer_history['stoRsi_4h'+label] - previous2Step_renderer_history['stoRsi_4h'+label])
+                    avg_4h_slope = math.copysign(1, currentStep_renderer_history['avg_4h'+label] - previous2Step_renderer_history['avg_4h'+label])
+                    stoRsiVol_4h_slope = math.copysign(1, currentStep_renderer_history['stoRsiVol_4h'+label] - previous2Step_renderer_history['stoRsiVol_4h'+label])
+                    avg_slope = math.copysign(1, currentStep_renderer_history['avg'+label] - previous2Step_renderer_history['avg'+label])
+                    stoRsiVol_slope = math.copysign(1, currentStep_renderer_history['stoRsiVol'+label] - previous2Step_renderer_history['stoRsiVol'+label])
+                    avg_1d_slope = math.copysign(1, currentStep_renderer_history['avg_1d'+label] - previous2Step_renderer_history['avg_1d'+label])
+                    stoRsiVol_1d_slope = math.copysign(1, currentStep_renderer_history['stoRsiVol_1d'+label] - previous2Step_renderer_history['stoRsiVol_1d'+label])
 
+
+                    total_slope = -1*(stoRsi_4h_slope + avg_4h_slope + stoRsiVol_4h_slope + avg_slope + stoRsiVol_slope + avg_1d_slope + stoRsiVol_1d_slope)
+                    
                     self._reward_metric['reward_avg'] = (lastTrade_renderer_history['avg'+label] + lastTrade_renderer_history['avg_4h'+label] + lastTrade_renderer_history['avg_1d'+label] - 150 )/1000
 
                     ### if avg is in overbought region, but stoRsi is not yet decreasing, penalized sell trade.
-                    if self._reward_metric['reward_avg'] > 0: self._reward_metric['reward_avg']*-1.0*stoRsi_4h_slope/abs(stoRsi_4h_slope)
-                    
+                    if self._reward_metric['reward_avg'] > 0: self._reward_metric['reward_avg'] = self._reward_metric['reward_avg']*total_slope
+                    else : self._reward_metric['reward_avg'] = abs(self._reward_metric['reward_avg']-150)*total_slope
+                        
                     # self._reward_metric['reward_stoRsiVol'] = (lastTrade_renderer_history['stoRsiVol'+label]-50)/1000
                     # self._reward_metric['reward_stoRsiVol'] = self._reward_metric['reward_stoRsiVol'] + (lastTrade_renderer_history['stoRsiVol_4h'+label]-50)/1000 
                     self._reward_metric['reward_stoRsiVol'] = (lastTrade_renderer_history['stoRsiVol'+label] + lastTrade_renderer_history['stoRsiVol_4h'+label] + lastTrade_renderer_history['stoRsiVol_1d'+label] -  150 )/1000
 
                     ### if stoRsiVol is in overbought region, but stoRsi is not yet decreasing, penalized sell trade.
-                    if self._reward_metric['reward_stoRsiVol'] > 0: self._reward_metric['reward_stoRsiVol']*-1.0*stoRsi_4h_slope/abs(stoRsi_4h_slope)
-                    
+                    if self._reward_metric['reward_stoRsiVol'] > 0: self._reward_metric['reward_stoRsiVol'] = self._reward_metric['reward_stoRsiVol']*total_slope
+                    else : self._reward_metric['reward_stoRsiVol'] = abs(self._reward_metric['reward_stoRsiVol']-150)*total_slope
+                        
                     if self._reward_metric['duration_sinceLastBuyTrade'] < self.minOpenDuration:
                         self._reward_metric['reward_duration'] = -20.0
                     elif self._reward_metric['duration_sinceLastBuyTrade'] > 14*self.stepPerDay:
