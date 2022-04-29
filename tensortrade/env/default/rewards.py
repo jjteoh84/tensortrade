@@ -448,14 +448,14 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
 
                     ### if avg is in oversold region, but stoRsi is not yet increasing, penalized buy trade. 
                     if self._reward_metric['reward_avg'] > 0: self._reward_metric['reward_avg'] =  self._reward_metric['reward_avg']*total_slope
-                    else: self._reward_metric['reward_avg'] = abs(self._reward_metric['reward_avg']-150)*total_slope
+                    else: self._reward_metric['reward_avg'] = abs(self._reward_metric['reward_avg']-0.15)*total_slope
                     # self._reward_metric['reward_stoRsiVol'] =  -1*(lastTrade_renderer_history['stoRsiVol'+label]-50.0)/1000.0
                     # self._reward_metric['reward_stoRsiVol'] = self._reward_metric['reward_stoRsiVol'] + (-1)*(lastTrade_renderer_history['stoRsiVol_4h'+label]-50.0)/1000.0
                     self._reward_metric['reward_stoRsiVol'] = -1*(lastTrade_renderer_history['stoRsiVol'+label] + lastTrade_renderer_history['stoRsiVol_4h'+label] + lastTrade_renderer_history['stoRsiVol_1d'+label] - 150.0)/1000
 
                     ### if stoRsiVol is in oversold region, but stoRsi is not yet increasing, penalized buy trade.
                     if self._reward_metric['reward_stoRsiVol'] > 0: self._reward_metric['reward_stoRsiVol'] = self._reward_metric['reward_stoRsiVol']*total_slope
-                    else: self._reward_metric['reward_stoRsiVol'] = abs(self._reward_metric['reward_stoRsiVol']-150)*total_slope
+                    else: self._reward_metric['reward_stoRsiVol'] = abs(self._reward_metric['reward_stoRsiVol']-0.15)*total_slope
                     
                     if self.buyTrade_perDay>0 and  self.buyTrade_perDay <= self.maxBuyTrade_perDay_beforePenalty:
                         self._reward_metric['penalty_nTrade'] = -1*(1.3**self.buyTrade_perDay-1.0)+10.0
@@ -585,7 +585,7 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
 
                     ### if avg is in overbought region, but stoRsi is not yet decreasing, penalized sell trade.
                     if self._reward_metric['reward_avg'] > 0: self._reward_metric['reward_avg'] = self._reward_metric['reward_avg']*total_slope
-                    else : self._reward_metric['reward_avg'] = abs(self._reward_metric['reward_avg']-150)*total_slope
+                    else : self._reward_metric['reward_avg'] = abs(self._reward_metric['reward_avg']-0.15)*total_slope
                         
                     # self._reward_metric['reward_stoRsiVol'] = (lastTrade_renderer_history['stoRsiVol'+label]-50)/1000
                     # self._reward_metric['reward_stoRsiVol'] = self._reward_metric['reward_stoRsiVol'] + (lastTrade_renderer_history['stoRsiVol_4h'+label]-50)/1000 
@@ -593,7 +593,7 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
 
                     ### if stoRsiVol is in overbought region, but stoRsi is not yet decreasing, penalized sell trade.
                     if self._reward_metric['reward_stoRsiVol'] > 0: self._reward_metric['reward_stoRsiVol'] = self._reward_metric['reward_stoRsiVol']*total_slope
-                    else : self._reward_metric['reward_stoRsiVol'] = abs(self._reward_metric['reward_stoRsiVol']-150)*total_slope
+                    else : self._reward_metric['reward_stoRsiVol'] = abs(self._reward_metric['reward_stoRsiVol']-0.15)*total_slope
                         
                     if self._reward_metric['duration_sinceLastBuyTrade'] < self.minOpenDuration:
                         self._reward_metric['reward_duration'] = -20.0
@@ -619,7 +619,7 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     # print('s-------reward_pivot: ', self._reward_metric['reward_pivot'])
                     # print('s-------reward_avg: ', self._reward_metric['reward_avg'])
                     #print('s------avg: ', lastTrade_renderer_history['avg'+label], '----', lastTrade_renderer_history['avg'])
-                    #print('s-------reward_stoRsiVol: ', self._reward_metric['reward_stoRsiVol'])
+                    # print('s-------reward_stoRsiVol: ', self._reward_metric['reward_stoRsiVol'])
                 else: ### after sell, stay at sideline 
                     self._reward_metric['reward_pivot'] = 0.0
                     self._reward_metric['reward_duration'] = 0.0
