@@ -628,21 +628,21 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
         # print('-----total_buyTrad ', self._reward_metric['total_buyTrades'])
         # print('-----buy_trade_perday', self.buyTrade_perDay)
 
-        if abs(self._reward_metric['reward_holding'])>0.08:
-            print('-----[reward_profit]: ', self._reward_metric['reward_profit'])    
-            print('-----[reward_pivot]: ' , self._reward_metric['reward_pivot'])
-            # print('-----[reward_stoRsi] :', self._reward_metric['reward_stoRsi'])
-            print('-----[reward_holding]: ', self._reward_metric['reward_holding'])
-            print('-----[reward_stoRsiVol] :', self._reward_metric['reward_stoRsiVol'])
-            print('-----[reward_avg] : ', self._reward_metric['reward_avg'])
-            # print('-----[reward_duration]: ', self._reward_metric['reward_duration'])
-            # print('-----([reward_stoRsi]+reward_stoRsivol+[reward_avg])/3.0 :', (self._reward_metric['reward_stoRsi']+self._reward_metric['reward_stoRsiVol']+self._reward_metric['reward_avg'])/3.0)
+#        if abs(self._reward_metric['reward_holding'])>0.08:
+            # print('-----[reward_profit]: ', self._reward_metric['reward_profit'])    
+            # print('-----[reward_pivot]: ' , self._reward_metric['reward_pivot'])
+            # # print('-----[reward_stoRsi] :', self._reward_metric['reward_stoRsi'])
+            # print('-----[reward_holding]: ', self._reward_metric['reward_holding'])
+            # print('-----[reward_stoRsiVol] :', self._reward_metric['reward_stoRsiVol'])
+            # print('-----[reward_avg] : ', self._reward_metric['reward_avg'])
+            # # print('-----[reward_duration]: ', self._reward_metric['reward_duration'])
+            # # print('-----([reward_stoRsi]+reward_stoRsivol+[reward_avg])/3.0 :', (self._reward_metric['reward_stoRsi']+self._reward_metric['reward_stoRsiVol']+self._reward_metric['reward_avg'])/3.0)
 
-            # print('-----penalty nTrade: -', self._reward_metric['penalty_nTrade'])
-            print('-----holding_pnl/total reward:', self._reward_metric['reward_holding']/total_reward*100)
-            print('-----total reward:', total_reward)  
-            print()
-            print()
+            # # print('-----penalty nTrade: -', self._reward_metric['penalty_nTrade'])
+            # print('-----holding_pnl/total reward:', self._reward_metric['reward_holding']/total_reward*100)
+            # print('-----total reward:', total_reward)  
+            # print()
+            # print()
         
         return total_reward
             
