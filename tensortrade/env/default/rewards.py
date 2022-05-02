@@ -438,58 +438,75 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     #self._reward_metric['reward_avg'] = 0.0 if lastTrade_renderer_history['avg'+label] >= 30.0 else abs(lastTrade_renderer_history['avg'+label]-30.0)/30.0
                     # self._reward_metric['reward_avg'] =  -1*(lastTrade_renderer_history['avg'+label]-50.0)/1000.0
                     # self._reward_metric['reward_avg'] = self._reward_metric['reward_avg'] + (-1)*(lastTrade_renderer_history['avg_4h'+label]-50.0)/1000.0
-                    stoRsi_4h_slope = math.copysign(1, currentStep_renderer_history['stoRsi_4h'+label] - previous2Step_renderer_history['stoRsi_4h'+label])
-                    avg_4h_slope = math.copysign(1, currentStep_renderer_history['avg_4h'+label] - previous2Step_renderer_history['avg_4h'+label])
-                    stoRsiVol_4h_slope = math.copysign(1, currentStep_renderer_history['stoRsiVol_4h'+label] - previous2Step_renderer_history['stoRsiVol_4h'+label])
-                    avg_slope = math.copysign(1, currentStep_renderer_history['avg'+label] - previous2Step_renderer_history['avg'+label])
-                    stoRsiVol_slope = math.copysign(1, currentStep_renderer_history['stoRsiVol'+label] - previous2Step_renderer_history['stoRsiVol'+label])
-                    avg_1d_slope = math.copysign(1, currentStep_renderer_history['avg_1d'+label] - previous2Step_renderer_history['avg_1d'+label])
-                    stoRsiVol_1d_slope = math.copysign(1, currentStep_renderer_history['stoRsiVol_1d'+label] - previous2Step_renderer_history['stoRsiVol_1d'+label])
+                    _a = currentStep_renderer_history['stoRsi_4h'+label] - previous2Step_renderer_history['stoRsi_4h'+label]
+                    stoRsi_4h_slope = 0.0 if _a == 0.0 else math.copysign(0.8, _a)
+                    
+                    _a = currentStep_renderer_history['avg_4h'+label] - previous2Step_renderer_history['avg_4h'+label]
+                    avg_4h_slope = 0.0 if _a == 0.0 else math.copysign(0.8, _a)
+
+                    _a = currentStep_renderer_history['stoRsiVol_4h'+label] - previous2Step_renderer_history['stoRsiVol_4h'+label]
+                    stoRsiVol_4h_slope = 0.0 if _a == 0.0 else math.copysign(0.8, _a)
+
+                    _a = currentStep_renderer_history['avg'+label] - previous2Step_renderer_history['avg'+label]
+                    avg_slope = 0.0 if _a == 0.0 else math.copysign(0.9, _a)
+
+                    _a = currentStep_renderer_history['stoRsiVol'+label] - previous2Step_renderer_history['stoRsiVol'+label]
+                    stoRsiVol_slope = 0.0 if _a == 0.0 else math.copysign(0.9, _a)
+
+                    _a = currentStep_renderer_history['avg_1d'+label] - previous2Step_renderer_history['avg_1d'+label]
+                    avg_1d_slope = 0.0 if _a == 0.0 else math.copysign(1, _a)
+
+                    _a = currentStep_renderer_history['stoRsiVol_1d'+label] - previous2Step_renderer_history['stoRsiVol_1d'+label]
+                    stoRsiVol_1d_slope = 0.0 if _a == 0.0 else math.copysign(1, _a)
 
 
-                    total_slope = 0.1*(stoRsi_4h_slope + avg_4h_slope + stoRsiVol_4h_slope + avg_slope + stoRsiVol_slope + avg_1d_slope + stoRsiVol_1d_slope)
+                    # total_slope = 0.1*(stoRsi_4h_slope + avg_4h_slope + stoRsiVol_4h_slope + avg_slope + stoRsiVol_slope + avg_1d_slope + stoRsiVol_1d_slope)
                     
                     # print('==========b==========-------current step: ', self.current_step)
                     # print(' b-------- stoRsi_4h_slope , avg_4h_slope,  stoRsiVol_4h_slope, avg_slope, stoRsiVol_slope, avg_1d_slope, stoRsiVol_1d_slope' )
                     # print('---------  {}       {}      {}       {}       {}       {}      {}      '.format(stoRsi_4h_slope , avg_4h_slope,  stoRsiVol_4h_slope, avg_slope, stoRsiVol_slope, avg_1d_slope, stoRsiVol_1d_slope))
                     # print(' b-------- total slope: ', total_slope  )
                     
-                    self._reward_metric['reward_avg'] = -1*(lastTrade_renderer_history['avg'+label] + lastTrade_renderer_history['avg_4h'+label] + lastTrade_renderer_history['avg_1d'+label] - 150.0)/1000
+                    #self._reward_metric['reward_avg'] = -1*(lastTrade_renderer_history['avg'+label] + lastTrade_renderer_history['avg_4h'+label] + lastTrade_renderer_history['avg_1d'+label] - 150.0)/1000
 
 
                     # print(' b-------- :   avg_4h,     avg,       avg_1d' )
                     # print(' b-------- :   {}          {}          {}'.format( lastTrade_renderer_history['avg_4h'+label], lastTrade_renderer_history['avg'+label], lastTrade_renderer_history['avg_1d'+label]  ))
 
-                                                                                                                      
+                    self._reward_metric['reward_avg'] = ( self.reward_at_quadrant(sign=1, var = lastTrade_renderer_history['avg_4h'+label] , slope = avg_4h_slope) + \
+                                                          self.reward_at_quadrant(sign=1, var = lastTrade_renderer_history['avg'+label] , slope = avg_slope) + \
+                                                          self.reward_at_quadrant(sign=1, var = lastTrade_renderer_history['avg_1d'+label] , slope = avg_1d_slope) )/3000
                     # print(' b-------- reward_avg :', self._reward_metric['reward_avg'] )
                     
                                                                                                         
                     ### if avg is in oversold region, but stoRsi is not yet increasing, penalized buy trade. 
-                    if self._reward_metric['reward_avg'] > 0: self._reward_metric['reward_avg'] =  self._reward_metric['reward_avg']*total_slope
-                    elif abs(self._reward_metric['reward_avg']) == 0.0: self._reward_metric['reward_avg'] = 0.0
-                    elif self._reward_metric['reward_avg'] < 0.0: self._reward_metric['reward_avg'] = abs(self._reward_metric['reward_avg']+0.05)*total_slope
+                    # if self._reward_metric['reward_avg'] > 0: self._reward_metric['reward_avg'] =  self._reward_metric['reward_avg']*total_slope
+                    # elif abs(self._reward_metric['reward_avg']) == 0.0: self._reward_metric['reward_avg'] = 0.0
+                    # elif self._reward_metric['reward_avg'] < 0.0: self._reward_metric['reward_avg'] = abs(self._reward_metric['reward_avg']+0.05)*total_slope
                                                                                                                       
 
                     # print(' b-------- reward_avg*total_slope :', self._reward_metric['reward_avg'] )
 
-                                                                                                                      
-                                                                                                                    
+                                                                                                                                        
                     
                     # self._reward_metric['reward_stoRsiVol'] =  -1*(lastTrade_renderer_history['stoRsiVol'+label]-50.0)/1000.0
                     # self._reward_metric['reward_stoRsiVol'] = self._reward_metric['reward_stoRsiVol'] + (-1)*(lastTrade_renderer_history['stoRsiVol_4h'+label]-50.0)/1000.0
-                    self._reward_metric['reward_stoRsiVol'] = -1*(lastTrade_renderer_history['stoRsiVol'+label] + lastTrade_renderer_history['stoRsiVol_4h'+label] + lastTrade_renderer_history['stoRsiVol_1d'+label] - 150.0)/1000
+                    #self._reward_metric['reward_stoRsiVol'] = -1*(lastTrade_renderer_history['stoRsiVol'+label] + lastTrade_renderer_history['stoRsiVol_4h'+label] + lastTrade_renderer_history['stoRsiVol_1d'+label] - 150.0)/1000
 
 
                     # print(' b-------- :   stoRsiVol_4h,     stoRsiVol,       stoRsiVol_1d' )
                     # print(' b-------- :   {}          {}          {}'.format( lastTrade_renderer_history['stoRsiVol_4h'+label], lastTrade_renderer_history['stoRsiVol'+label], lastTrade_renderer_history['stoRsiVol_1d'+label]  ))
 
 
+                    self._reward_metric['reward_stoRsiVol'] = ( self.reward_at_quadrant(sign=1, var = lastTrade_renderer_history['stoRsiVol_4h'+label] , slope = stoRsiVol_4h_slope) + \
+                                                          self.reward_at_quadrant(sign=1, var = lastTrade_renderer_history['stoRsiVol'+label] , slope = stoRsiVol_slope) + \
+                                                          self.reward_at_quadrant(sign=1, var = lastTrade_renderer_history['stoRsiVol_1d'+label] , slope = stoRsiVol_1d_slope) )/3000
                     # print(' b-------- reward_stoRsiVol :', self._reward_metric['reward_stoRsiVol'] )
                     
                     ### if stoRsiVol is in oversold region, but stoRsi is not yet increasing, penalized buy trade.
-                    if self._reward_metric['reward_stoRsiVol'] > 0.0: self._reward_metric['reward_stoRsiVol'] = self._reward_metric['reward_stoRsiVol']*total_slope
-                    elif abs(self._reward_metric['reward_stoRsiVol']) == 0.0: self._reward_metric['reward_stoRsiVol'] = 0.0
-                    elif self._reward_metric['reward_stoRsiVol'] < 0.0: self._reward_metric['reward_stoRsiVol'] = abs(self._reward_metric['reward_stoRsiVol']+0.05)*total_slope
+                    # if self._reward_metric['reward_stoRsiVol'] > 0.0: self._reward_metric['reward_stoRsiVol'] = self._reward_metric['reward_stoRsiVol']*total_slope
+                    # elif abs(self._reward_metric['reward_stoRsiVol']) == 0.0: self._reward_metric['reward_stoRsiVol'] = 0.0
+                    # elif self._reward_metric['reward_stoRsiVol'] < 0.0: self._reward_metric['reward_stoRsiVol'] = abs(self._reward_metric['reward_stoRsiVol']+0.05)*total_slope
 
                     # print(' b-------- reward_stoRsiVol*total_slope :', self._reward_metric['reward_stoRsiVol'] )
                     # print()
@@ -615,16 +632,29 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     # self._reward_metric['reward_avg'] = self._reward_metric['reward_avg'] + (lastTrade_renderer_history['avg_4h'+label]-50)/1000
 
 
-                    stoRsi_4h_slope = math.copysign(1, currentStep_renderer_history['stoRsi_4h'+label] - previous2Step_renderer_history['stoRsi_4h'+label])
-                    avg_4h_slope = math.copysign(1, currentStep_renderer_history['avg_4h'+label] - previous2Step_renderer_history['avg_4h'+label])
-                    stoRsiVol_4h_slope = math.copysign(1, currentStep_renderer_history['stoRsiVol_4h'+label] - previous2Step_renderer_history['stoRsiVol_4h'+label])
-                    avg_slope = math.copysign(1, currentStep_renderer_history['avg'+label] - previous2Step_renderer_history['avg'+label])
-                    stoRsiVol_slope = math.copysign(1, currentStep_renderer_history['stoRsiVol'+label] - previous2Step_renderer_history['stoRsiVol'+label])
-                    avg_1d_slope = math.copysign(1, currentStep_renderer_history['avg_1d'+label] - previous2Step_renderer_history['avg_1d'+label])
-                    stoRsiVol_1d_slope = math.copysign(1, currentStep_renderer_history['stoRsiVol_1d'+label] - previous2Step_renderer_history['stoRsiVol_1d'+label])
+                    _a = currentStep_renderer_history['stoRsi_4h'+label] - previous2Step_renderer_history['stoRsi_4h'+label]
+                    stoRsi_4h_slope = 0.0 if _a == 0.0 else math.copysign(0.8, _a)
 
+                    _a = currentStep_renderer_history['avg_4h'+label] - previous2Step_renderer_history['avg_4h'+label]
+                    avg_4h_slope = 0.0 if _a == 0.0 else math.copysign(0.8, _a)
 
-                    total_slope = -0.1*(stoRsi_4h_slope + avg_4h_slope + stoRsiVol_4h_slope + avg_slope + stoRsiVol_slope + avg_1d_slope + stoRsiVol_1d_slope)
+                    _a = currentStep_renderer_history['stoRsiVol_4h'+label] - previous2Step_renderer_history['stoRsiVol_4h'+label]
+                    stoRsiVol_4h_slope = 0.0 if _a == 0.0 else math.copysign(0.8, _a)
+
+                    _a = currentStep_renderer_history['avg'+label] - previous2Step_renderer_history['avg'+label]
+                    avg_slope = 0.0 if _a == 0.0 else math.copysign(0.9, _a)
+
+                    _a = currentStep_renderer_history['stoRsiVol'+label] - previous2Step_renderer_history['stoRsiVol'+label]
+                    stoRsiVol_slope = 0.0 if _a == 0.0 else math.copysign(0.9, _a)
+
+                    _a = currentStep_renderer_history['avg_1d'+label] - previous2Step_renderer_history['avg_1d'+label]
+                    avg_1d_slope = 0.0 if _a == 0.0 else math.copysign(1, _a)
+
+                    _a = currentStep_renderer_history['stoRsiVol_1d'+label] - previous2Step_renderer_history['stoRsiVol_1d'+label]
+                    stoRsiVol_1d_slope = 0.0 if _a == 0.0 else math.copysign(1, _a)
+
+                    
+                    #total_slope = -0.1*(stoRsi_4h_slope + avg_4h_slope + stoRsiVol_4h_slope + avg_slope + stoRsiVol_slope + avg_1d_slope + stoRsiVol_1d_slope)
 
                     # print('==========s==========-------current step: ', self.current_step)
                     # print(' s-------- stoRsi_4h_slope , avg_4h_slope,  stoRsiVol_4h_slope, avg_slope, stoRsiVol_slope, avg_1d_slope, stoRsiVol_1d_slope' )
@@ -632,20 +662,23 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     # print(' s-------- total slope: ', total_slope  )
 
                     
-                    self._reward_metric['reward_avg'] = (lastTrade_renderer_history['avg'+label] + lastTrade_renderer_history['avg_4h'+label] + lastTrade_renderer_history['avg_1d'+label] - 150 )/1000
+                    # self._reward_metric['reward_avg'] = (lastTrade_renderer_history['avg'+label] + lastTrade_renderer_history['avg_4h'+label] + lastTrade_renderer_history['avg_1d'+label] - 150 )/1000
 
 
                     # print(' s-------- :   avg_4h,     avg,       avg_1d' )
                     # print(' s-------- :   {}          {}          {}'.format( lastTrade_renderer_history['avg_4h'+label], lastTrade_renderer_history['avg'+label], lastTrade_renderer_history['avg_1d'+label]  ))
 
 
+                    self._reward_metric['reward_avg'] = ( self.reward_at_quadrant(sign=-1, var = lastTrade_renderer_history['avg_4h'+label] , slope = avg_4h_slope) + \
+                                                          self.reward_at_quadrant(sign=-1, var = lastTrade_renderer_history['avg'+label] , slope = avg_slope) + \
+                                                          self.reward_at_quadrant(sign=-1, var = lastTrade_renderer_history['avg_1d'+label] , slope = avg_1d_slope) )/3000
                     # print(' s-------- reward_avg :', self._reward_metric['reward_avg'] )
 
                     
                     ### if avg is in overbought region, but stoRsi is not yet decreasing, penalized sell trade.
-                    if self._reward_metric['reward_avg'] > 0.0: self._reward_metric['reward_avg'] = self._reward_metric['reward_avg']*total_slope
-                    elif abs(self._reward_metric['reward_avg']) == 0.0: self._reward_metric['reward_avg'] = 0.0
-                    elif self._reward_metric['reward_avg'] < 0.0: self._reward_metric['reward_avg'] = abs(self._reward_metric['reward_avg']+0.05)*total_slope
+                    # if self._reward_metric['reward_avg'] > 0.0: self._reward_metric['reward_avg'] = self._reward_metric['reward_avg']*total_slope
+                    # elif abs(self._reward_metric['reward_avg']) == 0.0: self._reward_metric['reward_avg'] = 0.0
+                    # elif self._reward_metric['reward_avg'] < 0.0: self._reward_metric['reward_avg'] = abs(self._reward_metric['reward_avg']+0.05)*total_slope
 
                     #print(' s-------- reward_avg*total_slope :', self._reward_metric['reward_avg'] )
                     
@@ -653,20 +686,23 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     # self._reward_metric['reward_stoRsiVol'] = (lastTrade_renderer_history['stoRsiVol'+label]-50)/1000
                     # self._reward_metric['reward_stoRsiVol'] = self._reward_metric['reward_stoRsiVol'] + (lastTrade_renderer_history['stoRsiVol_4h'+label]-50)/1000
 
-                    self._reward_metric['reward_stoRsiVol'] = (lastTrade_renderer_history['stoRsiVol'+label] + lastTrade_renderer_history['stoRsiVol_4h'+label] + lastTrade_renderer_history['stoRsiVol_1d'+label] -  150 )/1000
+                    # self._reward_metric['reward_stoRsiVol'] = (lastTrade_renderer_history['stoRsiVol'+label] + lastTrade_renderer_history['stoRsiVol_4h'+label] + lastTrade_renderer_history['stoRsiVol_1d'+label] -  150 )/1000
 
 
                     # print(' s-------- :   stoRsiVol_4h,     stoRsiVol,       stoRsiVol_1d' )
                     # print(' s-------- :   {}          {}          {}'.format( lastTrade_renderer_history['stoRsiVol_4h'+label], lastTrade_renderer_history['stoRsiVol'+label], lastTrade_renderer_history['stoRsiVol_1d'+label]  ))
 
 
+                    self._reward_metric['reward_stoRsiVol'] = ( self.reward_at_quadrant(sign=-1, var = lastTrade_renderer_history['stoRsiVol_4h'+label] , slope = stoRsiVol_4h_slope) + \
+                                                          self.reward_at_quadrant(sign=-1, var = lastTrade_renderer_history['stoRsiVol'+label] , slope = stoRsiVol_slope) + \
+                                                          self.reward_at_quadrant(sign=-1, var = lastTrade_renderer_history['stoRsiVol_1d'+label] , slope = stoRsiVol_1d_slope) )/3000
                     # print(' s-------- reward_stoRsiVol :', self._reward_metric['reward_stoRsiVol'] )
                     
                     
                     ### if stoRsiVol is in overbought region, but stoRsi is not yet decreasing, penalized sell trade.
-                    if self._reward_metric['reward_stoRsiVol'] > 0.0: self._reward_metric['reward_stoRsiVol'] = self._reward_metric['reward_stoRsiVol']*total_slope
-                    elif abs(self._reward_metric['reward_stoRsiVol']) == 0: self._reward_metric['reward_stoRsiVol'] == 0.0
-                    elif self._reward_metric['reward_stoRsiVol'] < 0.0 : self._reward_metric['reward_stoRsiVol'] = abs(self._reward_metric['reward_stoRsiVol']+0.05)*total_slope
+                    # if self._reward_metric['reward_stoRsiVol'] > 0.0: self._reward_metric['reward_stoRsiVol'] = self._reward_metric['reward_stoRsiVol']*total_slope
+                    # elif abs(self._reward_metric['reward_stoRsiVol']) == 0: self._reward_metric['reward_stoRsiVol'] == 0.0
+                    # elif self._reward_metric['reward_stoRsiVol'] < 0.0 : self._reward_metric['reward_stoRsiVol'] = abs(self._reward_metric['reward_stoRsiVol']+0.05)*total_slope
 
 
                     # print(' s-------- reward_stoRsiVol*total_slope :', self._reward_metric['reward_stoRsiVol'] )
@@ -741,7 +777,7 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
         #     total_reward = 0.0
 
         #        total_reward = self._reward_metric['reward_profit']
-        total_reward = 2.0*self._reward_metric['reward_profit'] + self._reward_metric['reward_pivot'] + self._reward_metric['reward_avg'] + self._reward_metric['reward_stoRsiVol'] + self._reward_metric['penalty_nTrade']
+        total_reward = 2.0*self._reward_metric['reward_profit'] + self._reward_metric['reward_pivot'] + self._reward_metric['reward_avg'] + self._reward_metric['reward_stoRsiVol'] 
         
         # print('-----total_buyTrad ', self._reward_metric['total_buyTrades'])
         # print('-----buy_trade_perday', self.buyTrade_perDay)
@@ -847,7 +883,34 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
         
         # return reward*10.0
         return reward/10.0
-        
+
+    def reward_at_quadrant(self, sign=1, var = 50.0 , slope = 0.0):
+        ### sign=1: to-buy  sign=-1: to-sell
+
+        if var<50.0:
+            if slope<0.0:
+                return sign*var*slope
+            elif slope>0.0:
+                return sign*(50.0-var)*slope
+            else:
+                return sign*(50.0-var)
+            
+        elif var>50.0:
+            if slope<0.0:
+                return sign*(var-50.0)*slope
+            elif slope>0.0:
+                return sign*(100.0-var)*slope
+            else:
+                return sign*(50.0-var)
+                
+        elif var==50.0:
+            if slope<0.0:
+                return sign*(-0.01)
+            elif slope>0.0:
+                return sign*0.01
+            else:
+                return 0.0
+    
     def reset(self) -> None:
         """Resets the `position` and `feed` of the reward scheme."""
         self.hasOrder = False
