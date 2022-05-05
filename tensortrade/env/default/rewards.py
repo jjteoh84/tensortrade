@@ -777,7 +777,7 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
         #     total_reward = 0.0
 
         #        total_reward = self._reward_metric['reward_profit']
-        total_reward = self._reward_metric['reward_profit'] + self._reward_metric['reward_pivot'] + self._reward_metric['reward_avg'] + self._reward_metric['reward_stoRsiVol'] 
+        total_reward = 20.0*self._reward_metric['reward_profit'] + 10.0*self._reward_metric['reward_pivot'] + 10.0*self._reward_metric['reward_avg'] + +10.0*self._reward_metric['reward_stoRsiVol'] 
         
         # print('-----total_buyTrad ', self._reward_metric['total_buyTrades'])
         # print('-----buy_trade_perday', self.buyTrade_perDay)
@@ -882,7 +882,7 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
         # print('-------------------------------------------')
         
         # return reward*10.0
-        return reward/10.0
+        return reward/100.0
 
     def reward_at_quadrant(self, sign=1, var = 50.0 , slope = 0.0):
         ### sign=1: to-buy  sign=-1: to-sell
