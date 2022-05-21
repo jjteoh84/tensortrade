@@ -473,9 +473,9 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     # print(' b-------- :   avg_4h,     avg,       avg_1d' )
                     # print(' b-------- :   {}          {}          {}'.format( lastTrade_renderer_history['avg_4h'+label], lastTrade_renderer_history['avg'+label], lastTrade_renderer_history['avg_1d'+label]  ))
 
-                    self._reward_metric['reward_avg'] = ( self.reward_at_quadrant(sign=1, var = lastTrade_renderer_history['avg_4h'+label] , slope = avg_4h_slope) + \
-                                                          self.reward_at_quadrant(sign=1, var = lastTrade_renderer_history['avg'+label] , slope = avg_slope) + \
-                                                          self.reward_at_quadrant(sign=1, var = lastTrade_renderer_history['avg_1d'+label] , slope = avg_1d_slope) )/3000
+                    # self._reward_metric['reward_avg'] = ( self.reward_at_quadrant(sign=1, var = lastTrade_renderer_history['avg_4h'+label] , slope = avg_4h_slope) + \
+                    #                                       self.reward_at_quadrant(sign=1, var = lastTrade_renderer_history['avg'+label] , slope = avg_slope) + \
+                    #                                       self.reward_at_quadrant(sign=1, var = lastTrade_renderer_history['avg_1d'+label] , slope = avg_1d_slope) )/3000
                     # print(' b-------- reward_avg :', self._reward_metric['reward_avg'] )
                     
                                                                                                         
@@ -491,16 +491,16 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     
                     # self._reward_metric['reward_stoRsiVol'] =  -1*(lastTrade_renderer_history['stoRsiVol'+label]-50.0)/1000.0
                     # self._reward_metric['reward_stoRsiVol'] = self._reward_metric['reward_stoRsiVol'] + (-1)*(lastTrade_renderer_history['stoRsiVol_4h'+label]-50.0)/1000.0
-                    #self._reward_metric['reward_stoRsiVol'] = -1*(lastTrade_renderer_history['stoRsiVol'+label] + lastTrade_renderer_history['stoRsiVol_4h'+label] + lastTrade_renderer_history['stoRsiVol_1d'+label] - 150.0)/3000
+                    self._reward_metric['reward_stoRsiVol'] = -1*(lastTrade_renderer_history['stoRsiVol'+label] + lastTrade_renderer_history['stoRsiVol_4h'+label] + lastTrade_renderer_history['stoRsiVol_1d'+label] - 150.0)/3000
 
 
                     # print(' b-------- :   stoRsiVol_4h,     stoRsiVol,       stoRsiVol_1d' )
                     # print(' b-------- :   {}          {}          {}'.format( lastTrade_renderer_history['stoRsiVol_4h'+label], lastTrade_renderer_history['stoRsiVol'+label], lastTrade_renderer_history['stoRsiVol_1d'+label]  ))
 
 
-                    self._reward_metric['reward_stoRsiVol'] = ( self.reward_at_quadrant(sign=1, var = lastTrade_renderer_history['stoRsiVol_4h'+label] , slope = stoRsiVol_4h_slope) + \
-                                                          self.reward_at_quadrant(sign=1, var = lastTrade_renderer_history['stoRsiVol'+label] , slope = stoRsiVol_slope) + \
-                                                          self.reward_at_quadrant(sign=1, var = lastTrade_renderer_history['stoRsiVol_1d'+label] , slope = stoRsiVol_1d_slope) )/3000
+                    # self._reward_metric['reward_stoRsiVol'] = ( self.reward_at_quadrant(sign=1, var = lastTrade_renderer_history['stoRsiVol_4h'+label] , slope = stoRsiVol_4h_slope) + \
+                    #                                       self.reward_at_quadrant(sign=1, var = lastTrade_renderer_history['stoRsiVol'+label] , slope = stoRsiVol_slope) + \
+                    #                                       self.reward_at_quadrant(sign=1, var = lastTrade_renderer_history['stoRsiVol_1d'+label] , slope = stoRsiVol_1d_slope) )/3000
                     # print(' b-------- reward_stoRsiVol :', self._reward_metric['reward_stoRsiVol'] )
                     
                     ### if stoRsiVol is in oversold region, but stoRsi is not yet increasing, penalized buy trade.
@@ -669,9 +669,9 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     # print(' s-------- :   {}          {}          {}'.format( lastTrade_renderer_history['avg_4h'+label], lastTrade_renderer_history['avg'+label], lastTrade_renderer_history['avg_1d'+label]  ))
 
 
-                    self._reward_metric['reward_avg'] = ( self.reward_at_quadrant(sign=-1, var = lastTrade_renderer_history['avg_4h'+label] , slope = avg_4h_slope) + \
-                                                          self.reward_at_quadrant(sign=-1, var = lastTrade_renderer_history['avg'+label] , slope = avg_slope) + \
-                                                          self.reward_at_quadrant(sign=-1, var = lastTrade_renderer_history['avg_1d'+label] , slope = avg_1d_slope) )/3000
+                    # self._reward_metric['reward_avg'] = ( self.reward_at_quadrant(sign=-1, var = lastTrade_renderer_history['avg_4h'+label] , slope = avg_4h_slope) + \
+                    #                                       self.reward_at_quadrant(sign=-1, var = lastTrade_renderer_history['avg'+label] , slope = avg_slope) + \
+                    #                                       self.reward_at_quadrant(sign=-1, var = lastTrade_renderer_history['avg_1d'+label] , slope = avg_1d_slope) )/3000
                     # print(' s-------- reward_avg :', self._reward_metric['reward_avg'] )
 
                     
@@ -686,16 +686,16 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     # self._reward_metric['reward_stoRsiVol'] = (lastTrade_renderer_history['stoRsiVol'+label]-50)/1000
                     # self._reward_metric['reward_stoRsiVol'] = self._reward_metric['reward_stoRsiVol'] + (lastTrade_renderer_history['stoRsiVol_4h'+label]-50)/1000
 
-                    #self._reward_metric['reward_stoRsiVol'] = (lastTrade_renderer_history['stoRsiVol'+label] + lastTrade_renderer_history['stoRsiVol_4h'+label] + lastTrade_renderer_history['stoRsiVol_1d'+label] -  150 )/3000
+                    self._reward_metric['reward_stoRsiVol'] = (lastTrade_renderer_history['stoRsiVol'+label] + lastTrade_renderer_history['stoRsiVol_4h'+label] + lastTrade_renderer_history['stoRsiVol_1d'+label] -  150 )/3000
 
 
                     # print(' s-------- :   stoRsiVol_4h,     stoRsiVol,       stoRsiVol_1d' )
                     # print(' s-------- :   {}          {}          {}'.format( lastTrade_renderer_history['stoRsiVol_4h'+label], lastTrade_renderer_history['stoRsiVol'+label], lastTrade_renderer_history['stoRsiVol_1d'+label]  ))
 
 
-                    self._reward_metric['reward_stoRsiVol'] = ( self.reward_at_quadrant(sign=-1, var = lastTrade_renderer_history['stoRsiVol_4h'+label] , slope = stoRsiVol_4h_slope) + \
-                                                          self.reward_at_quadrant(sign=-1, var = lastTrade_renderer_history['stoRsiVol'+label] , slope = stoRsiVol_slope) + \
-                                                          self.reward_at_quadrant(sign=-1, var = lastTrade_renderer_history['stoRsiVol_1d'+label] , slope = stoRsiVol_1d_slope) )/3000
+                    # self._reward_metric['reward_stoRsiVol'] = ( self.reward_at_quadrant(sign=-1, var = lastTrade_renderer_history['stoRsiVol_4h'+label] , slope = stoRsiVol_4h_slope) + \
+                    #                                       self.reward_at_quadrant(sign=-1, var = lastTrade_renderer_history['stoRsiVol'+label] , slope = stoRsiVol_slope) + \
+                    #                                       self.reward_at_quadrant(sign=-1, var = lastTrade_renderer_history['stoRsiVol_1d'+label] , slope = stoRsiVol_1d_slope) )/3000
                     # print(' s-------- reward_stoRsiVol :', self._reward_metric['reward_stoRsiVol'] )
                     
                     
@@ -776,8 +776,9 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
         # else:
         #     total_reward = 0.0
 
-        #        total_reward = self._reward_metric['reward_profit']
-        total_reward = 20.0*self._reward_metric['reward_profit'] + 10.0*self._reward_metric['reward_pivot'] + 10.0*self._reward_metric['reward_avg']
+        total_reward = self._reward_metric['reward_profit']
+        #total_reward = 20.0*self._reward_metric['reward_profit'] + 10.0*self._reward_metric['reward_pivot'] \
+                       #+ 10.0*self._reward_metric['reward_avg']
         #+ 10.0*self._reward_metric['reward_stoRsiVol'] 
         
         # print('-----total_buyTrad ', self._reward_metric['total_buyTrades'])
