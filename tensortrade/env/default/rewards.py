@@ -406,7 +406,7 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
             lastTrade_renderer_history = self.renderer_history.iloc[last_trade_step - 1]
             currentStep_renderer_history = self.renderer_history.iloc[self.current_step - 1]
             previousStep_renderer_history = self.renderer_history.iloc[self.current_step - 2]
-            previous2Step_renderer_history = self.renderer_history.iloc[self.current_step - 3]
+            #previous2Step_renderer_history = self.renderer_history.iloc[self.current_step - 3]
             if len(list(trades)) > 1:
                 previousTrade_renderer_history = self.renderer_history.iloc[previous_trade.step - 1]
             
@@ -438,26 +438,28 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     #self._reward_metric['reward_avg'] = 0.0 if lastTrade_renderer_history['avg'+label] >= 30.0 else abs(lastTrade_renderer_history['avg'+label]-30.0)/30.0
                     # self._reward_metric['reward_avg'] =  -1*(lastTrade_renderer_history['avg'+label]-50.0)/1000.0
                     # self._reward_metric['reward_avg'] = self._reward_metric['reward_avg'] + (-1)*(lastTrade_renderer_history['avg_4h'+label]-50.0)/1000.0
-                    _a = currentStep_renderer_history['stoRsi_4h'+label] - previous2Step_renderer_history['stoRsi_4h'+label]
-                    stoRsi_4h_slope = 0.0 if _a == 0.0 else math.copysign(0.8, _a)
+
+
+                    # _a = currentStep_renderer_history['stoRsi_4h'+label] - previous2Step_renderer_history['stoRsi_4h'+label]
+                    # stoRsi_4h_slope = 0.0 if _a == 0.0 else math.copysign(0.8, _a)
                     
-                    _a = currentStep_renderer_history['avg_4h'+label] - previous2Step_renderer_history['avg_4h'+label]
-                    avg_4h_slope = 0.0 if _a == 0.0 else math.copysign(0.8, _a)
+                    # _a = currentStep_renderer_history['avg_4h'+label] - previous2Step_renderer_history['avg_4h'+label]
+                    # avg_4h_slope = 0.0 if _a == 0.0 else math.copysign(0.8, _a)
 
-                    _a = currentStep_renderer_history['stoRsiVol_4h'+label] - previous2Step_renderer_history['stoRsiVol_4h'+label]
-                    stoRsiVol_4h_slope = 0.0 if _a == 0.0 else math.copysign(0.8, _a)
+                    # _a = currentStep_renderer_history['stoRsiVol_4h'+label] - previous2Step_renderer_history['stoRsiVol_4h'+label]
+                    # stoRsiVol_4h_slope = 0.0 if _a == 0.0 else math.copysign(0.8, _a)
 
-                    _a = currentStep_renderer_history['avg'+label] - previous2Step_renderer_history['avg'+label]
-                    avg_slope = 0.0 if _a == 0.0 else math.copysign(0.9, _a)
+                    # _a = currentStep_renderer_history['avg'+label] - previous2Step_renderer_history['avg'+label]
+                    # avg_slope = 0.0 if _a == 0.0 else math.copysign(0.9, _a)
 
-                    _a = currentStep_renderer_history['stoRsiVol'+label] - previous2Step_renderer_history['stoRsiVol'+label]
-                    stoRsiVol_slope = 0.0 if _a == 0.0 else math.copysign(0.9, _a)
+                    # _a = currentStep_renderer_history['stoRsiVol'+label] - previous2Step_renderer_history['stoRsiVol'+label]
+                    # stoRsiVol_slope = 0.0 if _a == 0.0 else math.copysign(0.9, _a)
 
-                    _a = currentStep_renderer_history['avg_1d'+label] - previous2Step_renderer_history['avg_1d'+label]
-                    avg_1d_slope = 0.0 if _a == 0.0 else math.copysign(1, _a)
+                    # _a = currentStep_renderer_history['avg_1d'+label] - previous2Step_renderer_history['avg_1d'+label]
+                    # avg_1d_slope = 0.0 if _a == 0.0 else math.copysign(1, _a)
 
-                    _a = currentStep_renderer_history['stoRsiVol_1d'+label] - previous2Step_renderer_history['stoRsiVol_1d'+label]
-                    stoRsiVol_1d_slope = 0.0 if _a == 0.0 else math.copysign(1, _a)
+                    # _a = currentStep_renderer_history['stoRsiVol_1d'+label] - previous2Step_renderer_history['stoRsiVol_1d'+label]
+                    # stoRsiVol_1d_slope = 0.0 if _a == 0.0 else math.copysign(1, _a)
 
 
                     # total_slope = 0.1*(stoRsi_4h_slope + avg_4h_slope + stoRsiVol_4h_slope + avg_slope + stoRsiVol_slope + avg_1d_slope + stoRsiVol_1d_slope)
@@ -632,26 +634,26 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     # self._reward_metric['reward_avg'] = self._reward_metric['reward_avg'] + (lastTrade_renderer_history['avg_4h'+label]-50)/1000
 
 
-                    _a = currentStep_renderer_history['stoRsi_4h'+label] - previous2Step_renderer_history['stoRsi_4h'+label]
-                    stoRsi_4h_slope = 0.0 if _a == 0.0 else math.copysign(0.8, _a)
+                    # _a = currentStep_renderer_history['stoRsi_4h'+label] - previous2Step_renderer_history['stoRsi_4h'+label]
+                    # stoRsi_4h_slope = 0.0 if _a == 0.0 else math.copysign(0.8, _a)
 
-                    _a = currentStep_renderer_history['avg_4h'+label] - previous2Step_renderer_history['avg_4h'+label]
-                    avg_4h_slope = 0.0 if _a == 0.0 else math.copysign(0.8, _a)
+                    # _a = currentStep_renderer_history['avg_4h'+label] - previous2Step_renderer_history['avg_4h'+label]
+                    # avg_4h_slope = 0.0 if _a == 0.0 else math.copysign(0.8, _a)
 
-                    _a = currentStep_renderer_history['stoRsiVol_4h'+label] - previous2Step_renderer_history['stoRsiVol_4h'+label]
-                    stoRsiVol_4h_slope = 0.0 if _a == 0.0 else math.copysign(0.8, _a)
+                    # _a = currentStep_renderer_history['stoRsiVol_4h'+label] - previous2Step_renderer_history['stoRsiVol_4h'+label]
+                    # stoRsiVol_4h_slope = 0.0 if _a == 0.0 else math.copysign(0.8, _a)
 
-                    _a = currentStep_renderer_history['avg'+label] - previous2Step_renderer_history['avg'+label]
-                    avg_slope = 0.0 if _a == 0.0 else math.copysign(0.9, _a)
+                    # _a = currentStep_renderer_history['avg'+label] - previous2Step_renderer_history['avg'+label]
+                    # avg_slope = 0.0 if _a == 0.0 else math.copysign(0.9, _a)
 
-                    _a = currentStep_renderer_history['stoRsiVol'+label] - previous2Step_renderer_history['stoRsiVol'+label]
-                    stoRsiVol_slope = 0.0 if _a == 0.0 else math.copysign(0.9, _a)
+                    # _a = currentStep_renderer_history['stoRsiVol'+label] - previous2Step_renderer_history['stoRsiVol'+label]
+                    # stoRsiVol_slope = 0.0 if _a == 0.0 else math.copysign(0.9, _a)
 
-                    _a = currentStep_renderer_history['avg_1d'+label] - previous2Step_renderer_history['avg_1d'+label]
-                    avg_1d_slope = 0.0 if _a == 0.0 else math.copysign(1, _a)
+                    # _a = currentStep_renderer_history['avg_1d'+label] - previous2Step_renderer_history['avg_1d'+label]
+                    # avg_1d_slope = 0.0 if _a == 0.0 else math.copysign(1, _a)
 
-                    _a = currentStep_renderer_history['stoRsiVol_1d'+label] - previous2Step_renderer_history['stoRsiVol_1d'+label]
-                    stoRsiVol_1d_slope = 0.0 if _a == 0.0 else math.copysign(1, _a)
+                    # _a = currentStep_renderer_history['stoRsiVol_1d'+label] - previous2Step_renderer_history['stoRsiVol_1d'+label]
+                    # stoRsiVol_1d_slope = 0.0 if _a == 0.0 else math.copysign(1, _a)
 
                     
                     #total_slope = -0.1*(stoRsi_4h_slope + avg_4h_slope + stoRsiVol_4h_slope + avg_slope + stoRsiVol_slope + avg_1d_slope + stoRsiVol_1d_slope)
