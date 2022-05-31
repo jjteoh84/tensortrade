@@ -815,9 +815,9 @@ class PlotlyTradingChart(BaseRenderer):
         ))
         self.fig.update_traces(hovertext=price_history['date'].dt.strftime("%m/%d/%Y, %H:%M:%S"), selector=dict(type='candlestick'))
 
-        for trace in self.fig.select_traces(row=1):
-            if trace.name in self.pivot_sup_res:
-                trace.update({'y': price_history[trace.name]})
+        # for trace in self.fig.select_traces(row=1):
+        #     if trace.name in self.pivot_sup_res:
+        #         trace.update({'y': price_history[trace.name]})
 
 
         self.fig.layout.annotations += self._create_trade_annotations(trades, price_history)
@@ -839,20 +839,20 @@ class PlotlyTradingChart(BaseRenderer):
         self._ema200_chart.update({'y': price_history['ema200']})
         self._ema300_chart.update({'y': price_history['ema300']})
 
-        self._rsi_chart.update({'y': price_history['rsi_14']})
-        self._stoRsi_chart.update({'y': price_history['stoRsi']*100.0})
-        self._avg_chart.update({'y': price_history['avg']})
-        self._stoRsiVol_chart.update({'y': price_history['stoRsiVol']})
+        # self._rsi_chart.update({'y': price_history['rsi_14']})
+        # self._stoRsi_chart.update({'y': price_history['stoRsi']*100.0})
+        # self._avg_chart.update({'y': price_history['avg']})
+        # self._stoRsiVol_chart.update({'y': price_history['stoRsiVol']})
 
-        self._rsi_4h_chart.update({'y': price_history['rsi_14_4h']})
-        self._stoRsi_4h_chart.update({'y': price_history['stoRsi_4h']*100.0})
-        self._avg_4h_chart.update({'y': price_history['avg_4h']})
-        self._stoRsiVol_4h_chart.update({'y': price_history['stoRsiVol_4h']})
+        # self._rsi_4h_chart.update({'y': price_history['rsi_14_4h']})
+        # self._stoRsi_4h_chart.update({'y': price_history['stoRsi_4h']*100.0})
+        # self._avg_4h_chart.update({'y': price_history['avg_4h']})
+        # self._stoRsiVol_4h_chart.update({'y': price_history['stoRsiVol_4h']})
 
-        # self._rsi_x2_chart.update({'y': price_history['rsi_14_x2']})
-        # self._stoRsi_x2_chart.update({'y': price_history['stoRsi_x2']*100.0})
-        # self._avg_x2_chart.update({'y': price_history['avg_x2']})
-        # self._stoRsiVol_x2_chart.update({'y': price_history['stoRsiVol_x2']})
+        # # self._rsi_x2_chart.update({'y': price_history['rsi_14_x2']})
+        # # self._stoRsi_x2_chart.update({'y': price_history['stoRsi_x2']*100.0})
+        # # self._avg_x2_chart.update({'y': price_history['avg_x2']})
+        # # self._stoRsiVol_x2_chart.update({'y': price_history['stoRsiVol_x2']})
         
         metrics = self._calculate_trade_metric(trades, price_history)        
         metrics['max_drawDown (%)'] = metric.maximum_drawdown(net_worth)

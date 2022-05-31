@@ -411,9 +411,9 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                 previousTrade_renderer_history = self.renderer_history.iloc[previous_trade.step - 1]
             
             ##this might be the same when hasOrder is True
-            price_range= currentStep_renderer_history['PP_1d'+label] - currentStep_renderer_history['S3_1d'+label] ### TO-BE-Modified
+#            price_range= currentStep_renderer_history['PP_1d'+label] - currentStep_renderer_history['S3_1d'+label] ### TO-BE-Modified
             
-            if price_range<=0: print('-------price_range<0: ', price_range)# price_range = 1.0
+#            if price_range<=0: print('-------price_range<0: ', price_range)# price_range = 1.0
 #            price_range_noNorm = currentStep_renderer_history['PP_1d'] - lastTrade_renderer_history['S3_1d'] ### TO-BE-Modified
             if last_trade.side.value == "buy":
                 scaleFactor = 3.0              
@@ -431,7 +431,7 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     # print(currentStep_renderer_history[['date', 'open', 'high', 'low', 'close']])
 
                     self._reward_metric['reward_duration'] = 0.0
-                    self._reward_metric['reward_pivot'] = self.reward_at_price(lastTrade_renderer_history, float(lastTrade_renderer_history['close'+label]), True, label)
+                    #self._reward_metric['reward_pivot'] = self.reward_at_price(lastTrade_renderer_history, float(lastTrade_renderer_history['close'+label]), True, label)
 
                     #self._reward_metric['reward_stoRsi'] = 0.0 if lastTrade_renderer_history['stoRsi'+label] >= 0.1 else abs(lastTrade_renderer_history['stoRsi'+label]-0.1)/0.1
                     #self._reward_metric['reward_stoRsiVol'] = 0.0 if lastTrade_renderer_history['stoRsiVol'+label] >= 20.0 else abs(lastTrade_renderer_history['stoRsiVol'+label]-20.0)/20
@@ -493,7 +493,7 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     
                     # self._reward_metric['reward_stoRsiVol'] =  -1*(lastTrade_renderer_history['stoRsiVol'+label]-50.0)/1000.0
                     # self._reward_metric['reward_stoRsiVol'] = self._reward_metric['reward_stoRsiVol'] + (-1)*(lastTrade_renderer_history['stoRsiVol_4h'+label]-50.0)/1000.0
-                    self._reward_metric['reward_stoRsiVol'] = -1*(lastTrade_renderer_history['stoRsiVol'+label] + lastTrade_renderer_history['stoRsiVol_4h'+label] + lastTrade_renderer_history['stoRsiVol_1d'+label] - 150.0)/3000
+                    # self._reward_metric['reward_stoRsiVol'] = -1*(lastTrade_renderer_history['stoRsiVol'+label] + lastTrade_renderer_history['stoRsiVol_4h'+label] + lastTrade_renderer_history['stoRsiVol_1d'+label] - 150.0)/3000
 
 
                     # print(' b-------- :   stoRsiVol_4h,     stoRsiVol,       stoRsiVol_1d' )
@@ -618,7 +618,7 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     # print('---profit(%): ', profit)
                     
                     # self._reward_metric['reward_pivot'] = self.reward_at_price(lastTrade_renderer_history, float(last_trade.price), False, label)
-                    self._reward_metric['reward_pivot'] = self.reward_at_price(lastTrade_renderer_history, float(lastTrade_renderer_history['close'+label]), False, label)
+                    # self._reward_metric['reward_pivot'] = self.reward_at_price(lastTrade_renderer_history, float(lastTrade_renderer_history['close'+label]), False, label)
 
                     self._reward_metric['reward_profit'] = profit
                     if profit > 0: self.profitable_trade+=1
@@ -688,7 +688,7 @@ class SimpleProfitBaseInstr(TensorTradeRewardScheme):
                     # self._reward_metric['reward_stoRsiVol'] = (lastTrade_renderer_history['stoRsiVol'+label]-50)/1000
                     # self._reward_metric['reward_stoRsiVol'] = self._reward_metric['reward_stoRsiVol'] + (lastTrade_renderer_history['stoRsiVol_4h'+label]-50)/1000
 
-                    self._reward_metric['reward_stoRsiVol'] = (lastTrade_renderer_history['stoRsiVol'+label] + lastTrade_renderer_history['stoRsiVol_4h'+label] + lastTrade_renderer_history['stoRsiVol_1d'+label] -  150 )/3000
+                    # self._reward_metric['reward_stoRsiVol'] = (lastTrade_renderer_history['stoRsiVol'+label] + lastTrade_renderer_history['stoRsiVol_4h'+label] + lastTrade_renderer_history['stoRsiVol_1d'+label] -  150 )/3000
 
 
                     # print(' s-------- :   stoRsiVol_4h,     stoRsiVol,       stoRsiVol_1d' )
