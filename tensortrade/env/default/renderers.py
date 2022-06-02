@@ -815,9 +815,9 @@ class PlotlyTradingChart(BaseRenderer):
         ))
         self.fig.update_traces(hovertext=price_history['date'].dt.strftime("%m/%d/%Y, %H:%M:%S"), selector=dict(type='candlestick'))
 
-        # for trace in self.fig.select_traces(row=1):
-        #     if trace.name in self.pivot_sup_res:
-        #         trace.update({'y': price_history[trace.name]})
+        for trace in self.fig.select_traces(row=1):
+            if trace.name in self.pivot_sup_res:
+                trace.update({'y': price_history[trace.name]})
 
 
         self.fig.layout.annotations += self._create_trade_annotations(trades, price_history)
