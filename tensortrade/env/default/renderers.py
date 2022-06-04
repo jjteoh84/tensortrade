@@ -841,13 +841,13 @@ class PlotlyTradingChart(BaseRenderer):
 
         # self._rsi_chart.update({'y': price_history['rsi_14']})
         # self._stoRsi_chart.update({'y': price_history['stoRsi']*100.0})
-        self._avg_chart.update({'y': price_history['avg']})
-        # self._stoRsiVol_chart.update({'y': price_history['stoRsiVol']})
+        # self._avg_chart.update({'y': price_history['avg']})
+        self._stoRsiVol_chart.update({'y': price_history['stoRsiVol']})
 
         # self._rsi_4h_chart.update({'y': price_history['rsi_14_4h']})
         # self._stoRsi_4h_chart.update({'y': price_history['stoRsi_4h']*100.0})
-        self._avg_4h_chart.update({'y': price_history['avg_4h']})
-        # self._stoRsiVol_4h_chart.update({'y': price_history['stoRsiVol_4h']})
+        # self._avg_4h_chart.update({'y': price_history['avg_4h']})
+        self._stoRsiVol_4h_chart.update({'y': price_history['stoRsiVol_4h']})
 
         # # self._rsi_x2_chart.update({'y': price_history['rsi_14_x2']})
         # # self._stoRsi_x2_chart.update({'y': price_history['stoRsi_x2']*100.0})
